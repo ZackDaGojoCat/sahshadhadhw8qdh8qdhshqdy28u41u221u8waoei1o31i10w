@@ -131,8 +131,13 @@ const App: React.FC = () => {
     if (gameState === 'ONLINE_LOBBY' && !peer) {
         try {
             // ROBUST PEER INSTANTIATION
-            // Handle both default export and named export patterns
+            // Handle both default export and named export patterns to prevent crashes
             const PeerClass = (Peer as any).default || Peer;
+            
+            if (!PeerClass) {
+                throw new Error("PeerJS library not loaded correctly.");
+            }
+
             const newPeer = new PeerClass();
             
             newPeer.on('open', (id: string) => {
@@ -153,7 +158,7 @@ const App: React.FC = () => {
             setPeer(newPeer);
         } catch (error) {
             console.error("Failed to initialize PeerJS:", error);
-            setConnectionStatus("Failed to load PeerJS");
+            setConnectionStatus("Failed to load PeerJS (Offline Mode Only)");
         }
     }
     
