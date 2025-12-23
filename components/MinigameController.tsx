@@ -16,12 +16,12 @@ export const MinigameController: React.FC<MinigameControllerProps> = ({ type, on
 };
 
 // --- 1. SNOWFLAKE BARRAGE (Ice) ---
-// FASTER, PUNCHIER VERSION
+// SUPER FAST VERSION
 const SnowflakeMinigame: React.FC<{ onComplete: (m: number) => void }> = ({ onComplete }) => {
   const [snowballs, setSnowballs] = useState<{ id: number; x: number; y: number }[]>([]);
   const [hits, setHits] = useState(0);
   const [isHit, setIsHit] = useState(false); // Visual recoil for target
-  const [timeLeft, setTimeLeft] = useState(2500); // Reduced time to 2.5s for urgency
+  const [timeLeft, setTimeLeft] = useState(2500); // 2.5s for urgency
   
   useEffect(() => {
     const timer = setInterval(() => {
@@ -52,10 +52,10 @@ const SnowflakeMinigame: React.FC<{ onComplete: (m: number) => void }> = ({ onCo
     setIsHit(true);
     setTimeout(() => setIsHit(false), 50);
 
-    // Remove snowball faster
+    // Remove snowball almost instantly
     setTimeout(() => {
       setSnowballs(prev => prev.filter(s => s.id !== id));
-    }, 200); // 0.2s duration matches CSS animation
+    }, 150); // 0.15s duration matches CSS animation
   };
 
   const finish = () => {
@@ -88,7 +88,7 @@ const SnowflakeMinigame: React.FC<{ onComplete: (m: number) => void }> = ({ onCo
            {hits}
        </div>
 
-       {/* Flying Snowballs - SUPER FAST */}
+       {/* Flying Snowballs - LIGHTNING FAST */}
        {snowballs.map(s => (
           <div 
             key={s.id}
@@ -97,7 +97,7 @@ const SnowflakeMinigame: React.FC<{ onComplete: (m: number) => void }> = ({ onCo
                 left: `${s.x}%`, 
                 top: `${s.y}%`,
                 transform: `translate(-50%, -50%)`,
-                animation: 'flyToCenterFast 0.2s cubic-bezier(0.1, 0.7, 1.0, 0.1) forwards'
+                animation: 'flyToCenterInstant 0.15s cubic-bezier(0.1, 0.7, 1.0, 0.1) forwards'
             }}
           >
              <Icons.Snowflake size={48} className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,1)]" />
@@ -105,7 +105,7 @@ const SnowflakeMinigame: React.FC<{ onComplete: (m: number) => void }> = ({ onCo
        ))}
        
        <style>{`
-         @keyframes flyToCenterFast {
+         @keyframes flyToCenterInstant {
            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
            100% { left: 50%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(2); }
          }

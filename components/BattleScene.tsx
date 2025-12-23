@@ -30,24 +30,25 @@ const getIcon = (name: string): React.ElementType => {
 const HitMarker: React.FC = () => (
     <div className="absolute top-1/2 left-[80%] -translate-x-1/2 -translate-y-1/2 z-[60] pointer-events-none">
         <div className="w-32 h-32 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-ping opacity-75 border-4 border-white rounded-full"></div>
-        <div className="w-48 h-1 bg-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-45"></div>
-        <div className="w-48 h-1 bg-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45"></div>
+        <div className="w-48 h-1 bg-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-45 shadow-[0_0_10px_white]"></div>
+        <div className="w-48 h-1 bg-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 shadow-[0_0_10px_white]"></div>
     </div>
 );
 
 const Projectile: React.FC<{ icon: string, color: string }> = ({ icon, color }) => {
     const Icon = getIcon(icon);
     return (
-        <div className={`absolute top-1/2 left-[20%] z-50 animate-projectile`}>
+        <div className={`absolute top-1/2 left-[20%] z-50 animate-projectile-fast`}>
              <Icon size={48} className={color} />
              <div className={`absolute inset-0 blur-lg opacity-50 ${color.replace('text-', 'bg-')}`}></div>
              <style>{`
-                @keyframes projectile {
-                    0% { left: 20%; transform: translateY(-50%) scale(0.5); opacity: 0; }
+                @keyframes projectile-accel {
+                    0% { left: 20%; transform: translateY(-50%) scale(0.5) rotate(0deg); opacity: 0; }
                     20% { opacity: 1; }
-                    100% { left: 80%; transform: translateY(-50%) scale(1.5); opacity: 1; }
+                    100% { left: 80%; transform: translateY(-50%) scale(1.5) rotate(360deg); opacity: 1; }
                 }
-                .animate-projectile { animation: projectile 0.3s linear forwards; }
+                /* Use cubic-bezier to simulate acceleration (slow start, fast end impact) */
+                .animate-projectile-fast { animation: projectile-accel 0.25s cubic-bezier(0.5, 0, 1, 0.5) forwards; }
              `}</style>
         </div>
     );
@@ -57,12 +58,12 @@ const LaserBeam: React.FC<{ color: string }> = ({ color }) => (
     <div className="absolute top-1/2 left-0 w-full -translate-y-1/2 z-50">
         <div className={`h-16 w-full origin-left animate-beam opacity-80 ${color.replace('text-', 'bg-')} shadow-[0_0_50px_currentColor] mix-blend-screen`}></div>
          <style>{`
-            @keyframes beam {
-                0% { transform: scaleX(0); opacity: 0.5; }
-                10% { transform: scaleX(1); opacity: 1; }
+            @keyframes beam-snap {
+                0% { transform: scaleX(0); opacity: 0.8; }
+                20% { transform: scaleX(1); opacity: 1; }
                 100% { transform: scaleX(1); opacity: 0; }
             }
-            .animate-beam { animation: beam 0.5s ease-out forwards; }
+            .animate-beam { animation: beam-snap 0.3s ease-out forwards; }
          `}</style>
     </div>
 );
@@ -83,14 +84,14 @@ const Vortex: React.FC<{ color: string }> = ({ color }) => (
 
 const Explosion: React.FC<{ color: string }> = ({ color }) => (
     <div className="absolute top-1/2 left-[80%] -translate-x-1/2 -translate-y-1/2 z-50">
-         <div className={`w-16 h-16 rounded-full animate-explosion ${color.replace('text-', 'bg-')}`}></div>
+         <div className={`w-16 h-16 rounded-full animate-explosion-snap ${color.replace('text-', 'bg-')}`}></div>
          <style>{`
-            @keyframes explosion {
-                0% { transform: scale(0.5); opacity: 1; }
-                50% { transform: scale(4); opacity: 0.8; }
-                100% { transform: scale(6); opacity: 0; }
+            @keyframes explosion-snap {
+                0% { transform: scale(0.1); opacity: 1; }
+                30% { transform: scale(3.0); opacity: 0.9; }
+                100% { transform: scale(3.5); opacity: 0; }
             }
-            .animate-explosion { animation: explosion 0.5s ease-out forwards; }
+            .animate-explosion-snap { animation: explosion-snap 0.3s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; }
          `}</style>
     </div>
 );
@@ -102,10 +103,10 @@ const Slash: React.FC<{ color: string, type?: 'diag' | 'cross' | 'horizontal' }>
          <style>{`
             @keyframes slash {
                 0% { width: 0; opacity: 0; }
-                50% { width: 256px; opacity: 1; }
+                30% { width: 256px; opacity: 1; }
                 100% { width: 256px; opacity: 0; }
             }
-            .animate-slash { animation: slash 0.2s ease-out forwards; }
+            .animate-slash { animation: slash 0.15s ease-out forwards; }
          `}</style>
     </div>
 );
@@ -114,18 +115,18 @@ const Rain: React.FC<{ icon: string, color: string }> = ({ icon, color }) => {
     const Icon = getIcon(icon);
     return (
         <div className="absolute inset-0 z-50 overflow-hidden pointer-events-none">
-             {[...Array(12)].map((_, i) => (
-                 <div key={i} className="absolute animate-drop" style={{ left: `${50 + (i - 6) * 5}%`, animationDelay: `${i * 0.05}s` }}>
+             {[...Array(15)].map((_, i) => (
+                 <div key={i} className="absolute animate-drop" style={{ left: `${50 + (i - 7) * 5}%`, animationDelay: `${i * 0.02}s` }}>
                      <Icon size={32} className={color} />
                  </div>
              ))}
              <style>{`
                 @keyframes drop {
                     0% { top: -10%; opacity: 0; transform: scale(0.5); }
-                    50% { opacity: 1; transform: scale(1); }
+                    30% { opacity: 1; transform: scale(1); }
                     100% { top: 90%; opacity: 0; transform: scale(0.5); }
                 }
-                .animate-drop { animation: drop 0.6s linear forwards; }
+                .animate-drop { animation: drop 0.4s linear forwards; }
              `}</style>
         </div>
     )
@@ -134,7 +135,7 @@ const Rain: React.FC<{ icon: string, color: string }> = ({ icon, color }) => {
 const RisingPillars: React.FC<{ color: string }> = ({ color }) => (
     <div className="absolute bottom-0 left-[80%] -translate-x-1/2 w-48 h-full z-40 flex items-end justify-center gap-2 overflow-hidden pointer-events-none">
         {[...Array(3)].map((_, i) => (
-            <div key={i} className={`w-12 rounded-t-lg animate-rise ${color.replace('text-', 'bg-')}`} style={{ height: '100%', animationDelay: `${i * 0.1}s` }}></div>
+            <div key={i} className={`w-12 rounded-t-lg animate-rise ${color.replace('text-', 'bg-')}`} style={{ height: '100%', animationDelay: `${i * 0.05}s` }}></div>
         ))}
         <style>{`
             @keyframes rise {
@@ -142,7 +143,7 @@ const RisingPillars: React.FC<{ color: string }> = ({ color }) => (
                 40% { transform: translateY(20%); }
                 100% { transform: translateY(100%); }
             }
-            .animate-rise { animation: rise 0.5s ease-in-out forwards; }
+            .animate-rise { animation: rise 0.4s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; }
         `}</style>
     </div>
 );
@@ -151,10 +152,13 @@ const Orbit: React.FC<{ icon: string, color: string }> = ({ icon, color }) => {
     const Icon = getIcon(icon);
     return (
         <div className="absolute top-1/2 left-[80%] -translate-x-1/2 -translate-y-1/2 z-50">
-             <div className="relative w-32 h-32 animate-spin-slow">
+             <div className="relative w-32 h-32 animate-spin-fast">
                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2"><Icon size={24} className={color} /></div>
                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"><Icon size={24} className={color} /></div>
              </div>
+             <style>{`
+                .animate-spin-fast { animation: spin 0.5s linear infinite; }
+             `}</style>
         </div>
     )
 }
@@ -170,7 +174,7 @@ const GlitchEffect: React.FC<{ color: string }> = ({ color }) => (
                 60% { transform: translate(-5px, -5px); clip-path: inset(40% 0 40% 0); }
                 100% { transform: translate(0); clip-path: inset(0 0 0 0); }
             }
-            .animate-glitch { animation: glitch 0.3s steps(2) infinite; }
+            .animate-glitch { animation: glitch 0.2s steps(2) infinite; }
         `}</style>
     </div>
 );
@@ -178,15 +182,10 @@ const GlitchEffect: React.FC<{ color: string }> = ({ color }) => (
 // --- VFX CONFIG MAPPING ---
 
 const getVFXConfiguration = (abilityId: string, element: ElementType): { type: string, props: any } => {
-    
-    // Generic fallback based on element if ID isn't matched
-    let config = { type: 'projectile', props: { icon: 'Circle', color: 'text-white' } };
-    
     // Helper to get element color
     const color = ELEMENT_COLORS[element].split(' ')[0];
 
     // --- MAPPING LOGIC ---
-    
     // 1. BEAM TYPES
     if (['solar_beam', 'void_ray', 'aether_ray', 'plasma_cannon', 'prism_beam', 'laser_grid', 'judgment_day', 'gamma_ray', 'quasar', 'steam_jet'].includes(abilityId)) {
         return { type: 'beam', props: { color } };
@@ -410,7 +409,7 @@ export const BattleScene: React.FC<BattleSceneProps> = ({
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/80 pointer-events-none"></div>
 
       {/* Screen Flash Overlay */}
-      <div className={`absolute inset-0 pointer-events-none z-50 transition-opacity duration-300 ${flashScreen === 'red' ? 'bg-red-600/30' : flashScreen === 'white' ? 'bg-white/50' : 'opacity-0'}`}></div>
+      <div className={`absolute inset-0 pointer-events-none z-50 transition-opacity duration-150 ${flashScreen === 'red' ? 'bg-red-600/30' : flashScreen === 'white' ? 'bg-white/60' : 'opacity-0'}`}></div>
 
       {/* VFX Layer */}
       <div className="absolute inset-0 z-40 overflow-hidden pointer-events-none">
@@ -421,7 +420,7 @@ export const BattleScene: React.FC<BattleSceneProps> = ({
       <div className="relative z-10 w-full h-full flex justify-between items-center px-8 md:px-24">
         
         {/* PLAYER SIDE */}
-        <div className={`flex flex-col items-center gap-6 relative transition-transform duration-200 cubic-bezier(0.2, 0, 0, 1) ${getPlayerTransform()}`}>
+        <div className={`flex flex-col items-center gap-6 relative transition-transform duration-100 cubic-bezier(0.2, 0, 0, 1) ${getPlayerTransform()}`}>
             {damageNumbers.filter(d => d.x < 50).map(dn => (
                 <div key={dn.id} className="absolute -top-24 text-5xl font-black font-cinzel damage-number z-[60] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] stroke-black" style={{ color: dn.color, textShadow: '2px 2px 0 #000' }}>
                     {dn.value}
@@ -462,7 +461,7 @@ export const BattleScene: React.FC<BattleSceneProps> = ({
         )}
 
         {/* ENEMY SIDE */}
-        <div className={`flex flex-col items-center gap-6 relative transition-transform duration-200 cubic-bezier(0.2, 0, 0, 1) ${getEnemyTransform()}`}>
+        <div className={`flex flex-col items-center gap-6 relative transition-transform duration-100 cubic-bezier(0.2, 0, 0, 1) ${getEnemyTransform()}`}>
             {damageNumbers.filter(d => d.x >= 50).map(dn => (
                 <div key={dn.id} className="absolute -top-24 text-5xl font-black font-cinzel damage-number z-[60] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] stroke-black" style={{ color: dn.color, textShadow: '2px 2px 0 #000' }}>
                     {dn.value}
