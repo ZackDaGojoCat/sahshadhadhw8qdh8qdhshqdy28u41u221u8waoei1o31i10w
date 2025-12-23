@@ -19,8 +19,9 @@ const FallbackIcon: React.FC<{ className?: string; size?: number }> = ({ classNa
 );
 
 const getIcon = (name: string): React.ElementType => {
-  const icons = Icons as unknown as Record<string, React.ElementType | undefined>;
-  return icons[name] ?? Icons.CircleHelp ?? Icons.HelpCircle ?? Icons.AlertCircle ?? FallbackIcon;
+  // Cast to any to avoid build errors if specific icon names change in library versions
+  const icons = Icons as any;
+  return icons[name] ?? icons.CircleHelp ?? icons.HelpCircle ?? icons.AlertCircle ?? FallbackIcon;
 };
 
 const DEFAULT_WEAPON = WEAPONS[0];
@@ -203,23 +204,6 @@ const App: React.FC = () => {
           setEnemy(pvpEnemy);
           setGameState('COMBAT');
           setCombatLog([]);
-          // If I connected to them, I might go second, or random. 
-          // For simplicity: The one who sent the handshake LAST is second? 
-          // Better: Coin flip logic or just Host goes first. 
-          // PeerJS doesn't inherently define host/client cleanly for logic.
-          // Let's assume the one receiving the handshake (HOST) goes first.
-          // If I am receiving data, I am the HOST (if I waited) or CLIENT (if I connected).
-          // Checking connection initiator is tricky in this abstraction.
-          // Fallback: If my ID > their ID, I go first.
-          const myId = peer?.id || "";
-          // We don't have their ID easily in data unless sent.
-          // Hack: Connection initiator is usually 'player turn' in simple networking.
-          // Let's default to: If I received a handshake, I start combat. 
-          // Wait, both send handshakes.
-          // Let's just default to "Player Turn" initially for both, but block controls until 'TURN_END' received?
-          // No, simple: Player 1 (Host) is true, Player 2 (Join) is false.
-          // We need to know if we are host.
-          // If I have `conn.peer` (remote id), we can compare strings.
       }
       
       if (data.type === 'ATTACK') {

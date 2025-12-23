@@ -20,8 +20,9 @@ const FallbackIcon: React.FC<{ className?: string; size?: number }> = ({ classNa
 );
 
 const getIcon = (name: string): React.ElementType => {
-  const icons = Icons as unknown as Record<string, React.ElementType | undefined>;
-  return icons[name] ?? Icons.CircleHelp ?? Icons.HelpCircle ?? Icons.AlertCircle ?? FallbackIcon;
+  // Cast to any to avoid build errors if specific icon names change in library versions
+  const icons = Icons as any;
+  return icons[name] ?? icons.CircleHelp ?? icons.HelpCircle ?? icons.AlertCircle ?? FallbackIcon;
 };
 
 // --- UNIQUE PARTICLE SYSTEM ---
@@ -93,7 +94,7 @@ const Avatar: React.FC<{
     
     const nameToUse = iconName || (isEnemy ? 'Skull' : 'User');
     const IconComp = getIcon(nameToUse);
-    const CrownIcon = isBoss ? getIcon('Crown') : null;
+    const CrownIcon = getIcon('Crown');
 
     const baseColor = ELEMENT_COLORS[element].split(' ')[0]; 
     const glowColor = ELEMENT_COLORS[element].split(' ')[3]; 
@@ -132,7 +133,7 @@ const Avatar: React.FC<{
                     strokeWidth={1.5}
                 />
             </div>
-             {isBoss && CrownIcon && (
+             {isBoss && (
                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-yellow-500 drop-shadow-lg animate-bounce">
                     <CrownIcon size={32} />
                 </div>
@@ -160,7 +161,8 @@ const VFXLayer: React.FC<{ activeEffect: VisualEffect }> = ({ activeEffect }) =>
     const positionClass = isTargetPlayer ? 'left-[20%]' : 'right-[20%]';
 
     const getVfxIcon = (names: string[]): React.ElementType => {
-        const icons = Icons as unknown as Record<string, React.ElementType | undefined>;
+        // Cast to any for build safety
+        const icons = Icons as any;
         for (const name of names) {
             if (icons[name]) return icons[name]!;
         }

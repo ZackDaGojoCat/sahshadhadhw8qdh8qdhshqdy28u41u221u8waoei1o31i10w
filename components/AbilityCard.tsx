@@ -18,8 +18,9 @@ const FallbackIcon: React.FC<{ className?: string; size?: number }> = ({ classNa
 
 // ✅ STRICT PATTERN: getIcon must return React.ElementType
 const getIcon = (name: string): React.ElementType => {
-  const icons = Icons as unknown as Record<string, React.ElementType | undefined>;
-  return icons[name] ?? Icons.CircleHelp ?? Icons.HelpCircle ?? Icons.AlertCircle ?? FallbackIcon;
+  // Cast to any to avoid build errors if specific icon names change in library versions
+  const icons = Icons as any;
+  return icons[name] ?? icons.CircleHelp ?? icons.HelpCircle ?? icons.AlertCircle ?? FallbackIcon;
 };
 
 export const AbilityCard: React.FC<AbilityCardProps> = ({ ability, onClick, disabled, isUnlocked = true, cooldownRemaining = 0 }) => {
