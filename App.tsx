@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Player, Enemy, Ability, GameState, CombatLogEntry, DamageNumber, ElementType, VisualEffect, Weapon, P2PMessage, MinigameType 
@@ -10,10 +11,10 @@ import { encodePlayerToCode, decodeCodeToEnemy } from './services/pvpService';
 import { playSfx } from './services/audioService';
 import { BattleScene } from './components/BattleScene';
 import { AbilityCard } from './components/AbilityCard';
-import { MinigameController } from './components/MinigameController'; // NEW IMPORT
+import { MinigameController } from './components/MinigameController';
 import * as Icons from 'lucide-react';
 // @ts-ignore
-import { Peer } from 'peerjs';
+import Peer from 'peerjs';
 
 const FallbackIcon: React.FC<{ className?: string; size?: number }> = ({ className, size }) => (
   <div className={`w-4 h-4 rounded-full bg-gray-500 ${className ?? ''}`} style={{ width: size, height: size }} />
@@ -133,18 +134,28 @@ const App: React.FC = () => {
   // Initialize Peer
   useEffect(() => {
     if (gameState === 'ONLINE_LOBBY' && !peer) {
-        const newPeer = new Peer();
-        newPeer.on('open', (id: string) => {
-            setMyPeerId(id);
-            setConnectionStatus("Ready to connect");
-        });
+        try {
+            const newPeer = new Peer();
+            newPeer.on('open', (id: string) => {
+                setMyPeerId(id);
+                setConnectionStatus("Ready to connect");
+            });
 
-        newPeer.on('connection', (connection: any) => {
-            setConn(connection);
-            setupConnection(connection);
-        });
+            newPeer.on('connection', (connection: any) => {
+                setConn(connection);
+                setupConnection(connection);
+            });
 
-        setPeer(newPeer);
+            newPeer.on('error', (err: any) => {
+                console.error("PeerJS Error:", err);
+                setConnectionStatus("Connection Error (Check Console)");
+            });
+
+            setPeer(newPeer);
+        } catch (error) {
+            console.error("Failed to initialize PeerJS:", error);
+            setConnectionStatus("Failed to load PeerJS");
+        }
     }
     
     // Cleanup on exit
@@ -476,6 +487,7 @@ const App: React.FC = () => {
             setEnemy(e => e ? { ...e, currentHp: Math.max(0, e.currentHp - damage) } : null);
             addDamageNumber(damage, 75, 50, isCritical ? '#facc15' : '#fff');
             
+            // "M1" FEEL: Screen shake on impact
             triggerShake();
             setCombatPhase('player_return'); 
 
@@ -872,7 +884,7 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 w-full max-w-4xl p-4 flex flex-col gap-6 relative">
-        
+        {/* GAME STATES... (Kept the same structure as existing code) */}
         {/* CHARACTER SELECT */}
         {gameState === 'CHARACTER_SELECT' && (
             <div className="flex-1 flex flex-col items-center justify-center">

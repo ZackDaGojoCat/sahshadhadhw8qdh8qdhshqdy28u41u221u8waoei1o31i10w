@@ -21,12 +21,19 @@ const FallbackIcon: React.FC<{ className?: string; size?: number }> = ({ classNa
 );
 
 const getIcon = (name: string): React.ElementType => {
-  // Cast to any to avoid build errors if specific icon names change in library versions
   const icons = Icons as any;
   return icons[name] ?? icons.CircleHelp ?? icons.HelpCircle ?? icons.AlertCircle ?? FallbackIcon;
 };
 
-// --- ANIMATION COMPONENTS ---
+// --- VFX COMPONENTS ---
+
+const HitMarker: React.FC = () => (
+    <div className="absolute top-1/2 left-[80%] -translate-x-1/2 -translate-y-1/2 z-[60] pointer-events-none">
+        <div className="w-32 h-32 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-ping opacity-75 border-4 border-white rounded-full"></div>
+        <div className="w-48 h-1 bg-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-45"></div>
+        <div className="w-48 h-1 bg-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45"></div>
+    </div>
+);
 
 const Projectile: React.FC<{ icon: string, color: string }> = ({ icon, color }) => {
     const Icon = getIcon(icon);
@@ -40,7 +47,7 @@ const Projectile: React.FC<{ icon: string, color: string }> = ({ icon, color }) 
                     20% { opacity: 1; }
                     100% { left: 80%; transform: translateY(-50%) scale(1.5); opacity: 1; }
                 }
-                .animate-projectile { animation: projectile 0.4s linear forwards; }
+                .animate-projectile { animation: projectile 0.3s linear forwards; }
              `}</style>
         </div>
     );
@@ -259,6 +266,11 @@ const VFXLayer: React.FC<{ activeEffect: VisualEffect }> = ({ activeEffect }) =>
                 </div>
             </div>
         );
+    }
+
+    // HIT IMPACT (M1 Effect)
+    if (type === 'impact') {
+        return <HitMarker />;
     }
 
     if (!abilityId) return null;
