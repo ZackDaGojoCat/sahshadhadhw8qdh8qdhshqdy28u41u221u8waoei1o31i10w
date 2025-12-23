@@ -13,8 +13,7 @@ interface AbilityCardProps {
 
 export const AbilityCard: React.FC<AbilityCardProps> = ({ ability, onClick, disabled, isUnlocked = true, cooldownRemaining = 0 }) => {
   // Dynamically get icon
-  // @ts-ignore
-  const IconComponent = Icons[ability.icon] || Icons.HelpCircle;
+  const IconComponent = (Icons[ability.icon as keyof typeof Icons] || Icons.HelpCircle) as React.ElementType;
   
   const colorClass = ELEMENT_COLORS[ability.element];
   const bgClass = ELEMENT_BG_COLORS[ability.element];

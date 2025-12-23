@@ -24,13 +24,11 @@ const Avatar: React.FC<{
     isTurn?: boolean,
     isDead?: boolean
 }> = ({ iconName, element, isEnemy, isBoss, isPvP, isTurn, isDead }) => {
-    let IconComp: any;
+    let IconComp: React.ElementType;
     if (isPvP && iconName) {
-         // @ts-ignore
-        IconComp = Icons[iconName] || Icons.User;
+        IconComp = (Icons[iconName as keyof typeof Icons] || Icons.User) as React.ElementType;
     } else {
-         // @ts-ignore
-        IconComp = Icons[iconName] || (isEnemy ? Icons.Skull : Icons.User);
+        IconComp = (Icons[iconName as keyof typeof Icons] || (isEnemy ? Icons.Skull : Icons.User)) as React.ElementType;
     }
     
     const baseColor = ELEMENT_COLORS[element].split(' ')[0]; 
@@ -268,39 +266,50 @@ export const BattleScene: React.FC<BattleSceneProps> = ({
 
         {/* VS / Turn Indicator */}
         {combatPhase === 'idle' && player.currentHp > 0 && enemy && enemy.currentHp > 0 && (
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none flex flex-col items-center">
-               <span className="text-slate-700 font-black text-6xl italic opacity-30">VS</span>
-               {isPlayerTurn ? 
-                 <span className="text-blue-400 text-xs tracking-[0.3em] font-bold animate-pulse">YOUR TURN</span> : 
-                 <span className="text-red-500 text-xs tracking-[0.3em] font-bold animate-pulse">ENEMY TURN</span>
-               }
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
+                <div className="bg-slate-900/80 border-2 border-slate-600 px-4 py-2 rounded-lg backdrop-blur-sm transform -skew-x-12 shadow-xl">
+                    <span className="text-2xl font-black italic text-slate-200">VS</span>
+                </div>
             </div>
         )}
 
         {/* ENEMY SIDE */}
-        {enemy && (
-          <div className={`flex flex-col items-center gap-6 relative transition-transform duration-200 cubic-bezier(0.2, 0, 0, 1) ${getEnemyTransform()}`}>
-             {damageNumbers.filter(d => d.x > 50).map(dn => (
-                <div key={dn.id} className="absolute -top-24 text-6xl font-black font-cinzel damage-number z-[60] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ color: dn.color, textShadow: '2px 2px 0 #000' }}>
+        <div className={`flex flex-col items-center gap-6 relative transition-transform duration-200 cubic-bezier(0.2, 0, 0, 1) ${getEnemyTransform()}`}>
+            {damageNumbers.filter(d => d.x >= 50).map(dn => (
+                <div key={dn.id} className="absolute -top-24 text-5xl font-black font-cinzel damage-number z-[60] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] stroke-black" style={{ color: dn.color, textShadow: '2px 2px 0 #000' }}>
                     {dn.value}
                 </div>
             ))}
-            <Avatar iconName={enemy.iconName} element={enemy.element} isEnemy isBoss={enemy.isBoss} isPvP={enemy.isPvP} isTurn={!isPlayerTurn && combatPhase === 'idle'} isDead={enemy.currentHp <= 0} />
-            
-             {/* Enemy Health Bar */}
-            <div className={`transition-opacity duration-200 ${combatPhase !== 'idle' ? 'opacity-0' : 'opacity-100'} text-center`}>
-                <h3 className="text-slate-200 font-bold text-sm mb-1 drop-shadow-md">{enemy.name}</h3>
-                <div className="w-32 h-3 bg-slate-900 rounded-full border border-slate-700 overflow-hidden shadow-lg mx-auto relative">
-                     <div className="absolute inset-0 bg-red-900/50"></div>
-                    <div className="h-full bg-gradient-to-r from-red-600 to-orange-500 transition-all duration-300" style={{ width: `${Math.max(0, (enemy.currentHp / enemy.maxHp) * 100)}%` }}></div>
-                </div>
-                 <div className="flex justify-center gap-2 mt-1">
-                    <span className={`text-[9px] uppercase font-bold px-1.5 rounded bg-slate-800 border ${ELEMENT_COLORS[enemy.element]}`}>{enemy.element}</span>
-                    <span className="text-[10px] font-mono text-slate-500">Lvl {enemy.level}</span>
-                </div>
-            </div>
-          </div>
-        )}
+            {enemy && (
+                <>
+                    <Avatar 
+                        iconName={enemy.iconName} 
+                        element={enemy.element} 
+                        isEnemy 
+                        isBoss={enemy.isBoss} 
+                        isPvP={enemy.isPvP}
+                        isTurn={!isPlayerTurn && combatPhase === 'idle'}
+                        isDead={enemy.currentHp <= 0}
+                    />
+                    
+                    {/* Enemy Health Bar */}
+                    <div className={`transition-opacity duration-200 ${combatPhase !== 'idle' ? 'opacity-0' : 'opacity-100'}`}>
+                        <div className="w-32 h-3 bg-slate-900 rounded-full border border-slate-700 overflow-hidden shadow-lg relative">
+                            <div className="absolute inset-0 bg-red-900/50"></div>
+                            <div className="h-full bg-gradient-to-r from-red-600 to-red-400 transition-all duration-300" style={{ width: `${Math.max(0, (enemy.currentHp / enemy.maxHp) * 100)}%` }}></div>
+                        </div>
+                        <div className="flex justify-between mt-1 px-1">
+                            <span className="text-[10px] text-slate-400 font-bold tracking-wider">HP</span>
+                            <span className="text-[10px] text-red-400 font-mono">{Math.max(0, enemy.currentHp)}</span>
+                        </div>
+                        <div className="w-32 h-1.5 bg-slate-900 rounded-full border border-slate-700 overflow-hidden mt-1">
+                            <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${(enemy.currentMp / enemy.maxMp) * 100}%` }}></div>
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
+
       </div>
     </div>
   );

@@ -438,8 +438,7 @@ const App: React.FC = () => {
                 <h2 className="text-3xl font-bold fantasy-font mb-8 text-center">Choose Your Hero</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                     {CHARACTER_CLASSES.map((cls) => {
-                        // @ts-ignore
-                        const Icon = Icons[cls.iconName as keyof typeof Icons] || Icons.User;
+                        const Icon = (Icons[cls.iconName as keyof typeof Icons] || Icons.User) as React.ElementType;
                         // @ts-ignore
                         const borderColor = (ELEMENT_COLORS[cls.element] || "").split(' ')[1];
                         // @ts-ignore
@@ -551,11 +550,12 @@ const App: React.FC = () => {
                  </div>
 
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                     {WEAPONS.filter(w => w.price > 0 && w.damage > player.weapon.damage).map(weapon => (
+                     {WEAPONS.filter(w => w.price > 0 && w.damage > player.weapon.damage).map(weapon => {
+                        const WeaponIcon = (Icons[weapon.icon as keyof typeof Icons] || Icons.Sword) as React.ElementType;
+                        return (
                          <div key={weapon.id} className="bg-slate-900 p-4 rounded-xl border border-slate-700 flex items-center gap-4">
                              <div className="p-3 bg-slate-950 rounded-lg border border-slate-800">
-                                 {/* @ts-ignore */}
-                                 {React.createElement(Icons[weapon.icon] || Icons.Sword, { size: 24, className: 'text-slate-300' })}
+                                 <WeaponIcon size={24} className="text-slate-300" />
                              </div>
                              <div className="flex-1">
                                  <h4 className="font-bold text-slate-200">{weapon.name}</h4>
@@ -573,7 +573,8 @@ const App: React.FC = () => {
                                  {player.gold >= weapon.price ? 'Buy' : 'Locked'} <br/> {weapon.price}g
                              </button>
                          </div>
-                     ))}
+                        );
+                     })}
                  </div>
              </div>
         )}
