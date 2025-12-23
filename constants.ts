@@ -4,36 +4,51 @@ export const ELEMENT_COLORS: Record<ElementType, string> = {
   Physical: 'text-zinc-400 border-zinc-500 bg-zinc-900 shadow-zinc-500/50',
   Fire: 'text-orange-500 border-orange-500 bg-orange-950 shadow-orange-500/50',
   Water: 'text-blue-400 border-blue-400 bg-blue-950 shadow-blue-400/50',
-  Earth: 'text-emerald-500 border-emerald-500 bg-emerald-950 shadow-emerald-500/50',
+  Earth: 'text-amber-700 border-amber-700 bg-stone-900 shadow-amber-700/50',
   Air: 'text-cyan-300 border-cyan-300 bg-cyan-950 shadow-cyan-300/50',
   Lightning: 'text-purple-400 border-purple-400 bg-purple-950 shadow-purple-400/50',
   Ice: 'text-sky-200 border-sky-300 bg-sky-950 shadow-sky-300/50',
-  Light: 'text-yellow-200 border-yellow-300 bg-yellow-950 shadow-yellow-300/50',
-  Dark: 'text-violet-400 border-violet-500 bg-slate-950 shadow-violet-500/50',
+  Light: 'text-yellow-100 border-yellow-200 bg-yellow-950 shadow-yellow-200/50',
+  Dark: 'text-violet-900 border-violet-900 bg-black shadow-violet-900/50',
+  Nature: 'text-lime-400 border-lime-500 bg-lime-950 shadow-lime-500/50',
+  Metal: 'text-slate-300 border-slate-400 bg-slate-800 shadow-slate-400/50',
+  Blood: 'text-red-600 border-red-700 bg-red-950 shadow-red-600/50',
+  Time: 'text-fuchsia-300 border-fuchsia-400 bg-fuchsia-950 shadow-fuchsia-400/50',
+  Arcane: 'text-pink-400 border-pink-500 bg-pink-950 shadow-pink-500/50',
 };
 
 export const ELEMENT_BG_COLORS: Record<ElementType, string> = {
   Physical: 'bg-zinc-600',
   Fire: 'bg-orange-600',
   Water: 'bg-blue-600',
-  Earth: 'bg-emerald-600',
+  Earth: 'bg-amber-800',
   Air: 'bg-cyan-500',
   Lightning: 'bg-purple-600',
   Ice: 'bg-sky-500',
   Light: 'bg-yellow-500',
-  Dark: 'bg-violet-800',
+  Dark: 'bg-violet-950',
+  Nature: 'bg-lime-600',
+  Metal: 'bg-slate-500',
+  Blood: 'bg-red-800',
+  Time: 'bg-fuchsia-600',
+  Arcane: 'bg-pink-600',
 };
 
 export const TYPE_ADVANTAGE: Record<ElementType, ElementType> = {
   Fire: 'Ice',      
-  Ice: 'Earth',     
+  Ice: 'Nature',     
+  Nature: 'Earth',
   Earth: 'Lightning', 
   Lightning: 'Water', 
   Water: 'Fire',    
   Air: 'Earth',     
   Physical: 'Physical',
   Light: 'Dark',
-  Dark: 'Light'
+  Dark: 'Time',
+  Time: 'Arcane',
+  Arcane: 'Metal',
+  Metal: 'Blood',
+  Blood: 'Light'
 };
 
 export const WEAPONS: Weapon[] = [
@@ -68,7 +83,12 @@ export const WEAPONS: Weapon[] = [
     { id: 'gaia_wrath', name: 'Gaias Wrath', damage: 58, element: 'Earth', icon: 'Mountain', rarity: 'legendary', price: 2400 },
     { id: 'poseidon_trident', name: 'Trident', damage: 54, element: 'Water', icon: 'Anchor', rarity: 'legendary', price: 2200 },
     { id: 'bringer_of_light', name: 'Dawnbreaker', damage: 56, element: 'Light', icon: 'Sun', rarity: 'legendary', price: 2400 },
-    { id: 'void_edge', name: 'Void Edge', damage: 59, element: 'Dark', icon: 'Skull', rarity: 'legendary', price: 2500 }
+    { id: 'void_edge', name: 'Void Edge', damage: 59, element: 'Dark', icon: 'Skull', rarity: 'legendary', price: 2500 },
+
+    // GODLY (Prestige Exclusive)
+    { id: 'infinity_blade', name: 'Infinity Blade', damage: 100, element: 'Arcane', icon: 'Infinity', rarity: 'godly', price: 10000 },
+    { id: 'world_ender', name: 'World Ender', damage: 120, element: 'Dark', icon: 'Globe', rarity: 'godly', price: 15000 },
+    { id: 'chronos_scepter', name: 'Scepter of Aeons', damage: 90, element: 'Time', icon: 'Clock', rarity: 'godly', price: 12000 },
 ];
 
 export const ABILITIES: Ability[] = [
@@ -152,9 +172,55 @@ export const ABILITIES: Ability[] = [
   { id: 'void_ray', name: 'Void Ray', description: 'Channel the void.', element: 'Dark', manaCost: 60, damage: 100, cooldown: 3, unlockLevel: 5, icon: 'ZapOff' },
   { id: 'eclipse', name: 'Eclipse', description: 'Block out the sun.', element: 'Dark', manaCost: 75, damage: 130, cooldown: 4, unlockLevel: 6, icon: 'Moon' },
   { id: 'cataclysm', name: 'Cataclysm', description: 'Unleash total destruction.', element: 'Dark', manaCost: 100, damage: 170, cooldown: 5, unlockLevel: 7, icon: 'Skull' },
+
+  // --- NATURE (7) ---
+  { id: 'vine_whip', name: 'Vine Whip', description: 'Strike with thorny vines.', element: 'Nature', manaCost: 12, damage: 18, cooldown: 0, unlockLevel: 1, icon: 'Flower' },
+  { id: 'leech_seed', name: 'Leech Seed', description: 'Drain life from the enemy.', element: 'Nature', manaCost: 25, damage: 20, heal: 20, cooldown: 2, unlockLevel: 2, icon: 'Sprout' },
+  { id: 'razor_leaf', name: 'Razor Leaf', description: 'Sharp leaves slice the air.', element: 'Nature', manaCost: 35, damage: 50, cooldown: 1, unlockLevel: 3, icon: 'Feather' },
+  { id: 'photosynthesis', name: 'Regrowth', description: 'Absorb nature energy to heal.', element: 'Nature', manaCost: 50, heal: 90, damage: 0, cooldown: 4, unlockLevel: 4, icon: 'Sun' },
+  { id: 'root_crush', name: 'Root Crush', description: 'Roots burst from the ground.', element: 'Nature', manaCost: 60, damage: 85, cooldown: 3, unlockLevel: 5, icon: 'Trees' },
+  { id: 'solar_beam', name: 'Solar Beam', description: 'Concentrated solar power.', element: 'Nature', manaCost: 80, damage: 125, cooldown: 4, unlockLevel: 6, icon: 'Zap' },
+  { id: 'wrath_of_gaia', name: 'Wrath of Gaia', description: 'The forest strikes back.', element: 'Nature', manaCost: 100, damage: 165, cooldown: 5, unlockLevel: 7, icon: 'Mountain' },
+
+  // --- METAL (7) ---
+  { id: 'iron_fist', name: 'Iron Fist', description: 'A punch as hard as steel.', element: 'Metal', manaCost: 10, damage: 20, cooldown: 0, unlockLevel: 1, icon: 'HandMetal' },
+  { id: 'shrapnel', name: 'Shrapnel', description: 'Explosive metal fragments.', element: 'Metal', manaCost: 20, damage: 35, cooldown: 1, unlockLevel: 2, icon: 'Hexagon' },
+  { id: 'steel_barrier', name: 'Steel Barrier', description: 'Repair armor plating.', element: 'Metal', manaCost: 40, heal: 60, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'Shield' },
+  { id: 'blade_dance', name: 'Blade Dance', description: 'A whirlwind of sharp edges.', element: 'Metal', manaCost: 50, damage: 70, cooldown: 2, unlockLevel: 4, icon: 'Swords' },
+  { id: 'spike_rain', name: 'Spike Rain', description: 'Heavy spikes fall from above.', element: 'Metal', manaCost: 65, damage: 95, cooldown: 3, unlockLevel: 5, icon: 'ArrowDown' },
+  { id: 'guillotine', name: 'Guillotine', description: 'A massive falling blade.', element: 'Metal', manaCost: 80, damage: 130, cooldown: 4, unlockLevel: 6, icon: 'Crop' },
+  { id: 'titan_smash', name: 'Titan Smash', description: 'Crush with titanic force.', element: 'Metal', manaCost: 100, damage: 170, cooldown: 5, unlockLevel: 7, icon: 'Hammer' },
+
+  // --- BLOOD (7) ---
+  { id: 'claw_rake', name: 'Claw Rake', description: 'Tear flesh.', element: 'Blood', manaCost: 5, damage: 25, cooldown: 0, unlockLevel: 1, icon: 'Scissors' },
+  { id: 'transfusion', name: 'Transfusion', description: 'Steal life essence.', element: 'Blood', manaCost: 30, damage: 30, heal: 30, cooldown: 2, unlockLevel: 2, icon: 'Droplets' },
+  { id: 'blood_boil', name: 'Blood Boil', description: 'Boil the enemy from within.', element: 'Blood', manaCost: 40, damage: 60, cooldown: 2, unlockLevel: 3, icon: 'Flame' },
+  { id: 'hemorrhage', name: 'Hemorrhage', description: 'Cause massive bleeding.', element: 'Blood', manaCost: 55, damage: 80, cooldown: 3, unlockLevel: 4, icon: 'Activity' },
+  { id: 'sanguine_pact', name: 'Sanguine Pact', description: 'Forbidden healing.', element: 'Blood', manaCost: 50, heal: 100, damage: 0, cooldown: 4, unlockLevel: 5, icon: 'Heart' },
+  { id: 'crimson_nova', name: 'Crimson Nova', description: 'Explode in a mist of red.', element: 'Blood', manaCost: 80, damage: 135, cooldown: 4, unlockLevel: 6, icon: 'Sun' },
+  { id: 'exsanguinate', name: 'Exsanguinate', description: 'Drain every drop.', element: 'Blood', manaCost: 110, damage: 180, cooldown: 5, unlockLevel: 7, icon: 'Droplets' },
+
+  // --- TIME (7) ---
+  { id: 'tick_tock', name: 'Tick Tock', description: 'Time ticks away HP.', element: 'Time', manaCost: 15, damage: 20, cooldown: 0, unlockLevel: 1, icon: 'Clock' },
+  { id: 'rewind', name: 'Rewind', description: 'Reverse damage taken.', element: 'Time', manaCost: 40, heal: 70, damage: 0, cooldown: 3, unlockLevel: 2, icon: 'Undo2' },
+  { id: 'accelerate', name: 'Accelerate', description: 'Speed up attacks.', element: 'Time', manaCost: 35, damage: 50, cooldown: 1, unlockLevel: 3, icon: 'FastForward' },
+  { id: 'decay', name: 'Rapid Decay', description: 'Age the enemy instantly.', element: 'Time', manaCost: 50, damage: 75, cooldown: 2, unlockLevel: 4, icon: 'Hourglass' },
+  { id: 'paradox', name: 'Paradox', description: 'Reality glitches violently.', element: 'Time', manaCost: 70, damage: 110, cooldown: 3, unlockLevel: 5, icon: 'HelpCircle' },
+  { id: 'future_strike', name: 'Future Strike', description: 'An attack from tomorrow.', element: 'Time', manaCost: 85, damage: 140, cooldown: 4, unlockLevel: 6, icon: 'ArrowRight' },
+  { id: 'time_stop', name: 'Chrono Break', description: 'Shatter the timeline.', element: 'Time', manaCost: 100, damage: 175, cooldown: 5, unlockLevel: 7, icon: 'Watch' },
+
+  // --- ARCANE (7) ---
+  { id: 'magic_missile', name: 'Magic Missile', description: 'A bolt of pure energy.', element: 'Arcane', manaCost: 10, damage: 18, cooldown: 0, unlockLevel: 1, icon: 'Sparkles' },
+  { id: 'mystic_orb', name: 'Mystic Orb', description: 'Launch a volatile sphere.', element: 'Arcane', manaCost: 25, damage: 40, cooldown: 1, unlockLevel: 2, icon: 'Circle' },
+  { id: 'barrier', name: 'Mana Barrier', description: 'Convert mana to health.', element: 'Arcane', manaCost: 40, heal: 60, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'Shield' },
+  { id: 'rune_blast', name: 'Rune Blast', description: 'Detonate ancient runes.', element: 'Arcane', manaCost: 45, damage: 65, cooldown: 2, unlockLevel: 4, icon: 'Hexagon' },
+  { id: 'aether_ray', name: 'Aether Ray', description: 'Beam of raw magic.', element: 'Arcane', manaCost: 65, damage: 100, cooldown: 3, unlockLevel: 5, icon: 'Zap' },
+  { id: 'disintegrate', name: 'Disintegrate', description: 'Dust to dust.', element: 'Arcane', manaCost: 85, damage: 140, cooldown: 4, unlockLevel: 6, icon: 'Wind' },
+  { id: 'supernova_arcane', name: 'Cosmic Burst', description: 'The energy of stars.', element: 'Arcane', manaCost: 100, damage: 170, cooldown: 5, unlockLevel: 7, icon: 'Star' },
 ];
 
 export const CHARACTER_CLASSES: CharacterClass[] = [
+  // --- BASE CLASSES ---
   {
     id: 'knight',
     name: 'Ember Knight',
@@ -164,7 +230,8 @@ export const CHARACTER_CLASSES: CharacterClass[] = [
     element: 'Fire',
     iconName: 'Shield',
     startingAbilities: ['strike', 'ember'],
-    startingWeaponId: 'rusty_sword'
+    startingWeaponId: 'rusty_sword',
+    requiredPrestige: 0
   },
   {
     id: 'mage',
@@ -175,7 +242,8 @@ export const CHARACTER_CLASSES: CharacterClass[] = [
     element: 'Water',
     iconName: 'Sparkles',
     startingAbilities: ['quick_slash', 'heal'],
-    startingWeaponId: 'training_wand'
+    startingWeaponId: 'training_wand',
+    requiredPrestige: 0
   },
   {
     id: 'rogue',
@@ -186,7 +254,8 @@ export const CHARACTER_CLASSES: CharacterClass[] = [
     element: 'Air',
     iconName: 'Feather',
     startingAbilities: ['quick_slash', 'gust'],
-    startingWeaponId: 'chipped_dagger'
+    startingWeaponId: 'chipped_dagger',
+    requiredPrestige: 0
   },
   {
     id: 'guardian',
@@ -197,18 +266,8 @@ export const CHARACTER_CLASSES: CharacterClass[] = [
     element: 'Earth',
     iconName: 'Mountain',
     startingAbilities: ['strike', 'pebble'],
-    startingWeaponId: 'heavy_club'
-  },
-  {
-    id: 'druid',
-    name: 'Forest Druid',
-    description: 'Draws power from the earth. Balanced.',
-    baseHp: 120,
-    baseMp: 80,
-    element: 'Earth',
-    iconName: 'Leaf',
-    startingAbilities: ['pebble', 'rock_throw'],
-    startingWeaponId: 'magic_staff'
+    startingWeaponId: 'heavy_club',
+    requiredPrestige: 0
   },
   {
     id: 'storm',
@@ -219,7 +278,8 @@ export const CHARACTER_CLASSES: CharacterClass[] = [
     element: 'Lightning',
     iconName: 'Zap',
     startingAbilities: ['quick_slash', 'spark'],
-    startingWeaponId: 'training_wand'
+    startingWeaponId: 'training_wand',
+    requiredPrestige: 0
   },
   {
     id: 'frost',
@@ -230,7 +290,8 @@ export const CHARACTER_CLASSES: CharacterClass[] = [
     element: 'Ice',
     iconName: 'Snowflake',
     startingAbilities: ['strike', 'ice_shard'],
-    startingWeaponId: 'rusty_sword'
+    startingWeaponId: 'rusty_sword',
+    requiredPrestige: 0
   },
   {
     id: 'paladin',
@@ -241,7 +302,8 @@ export const CHARACTER_CLASSES: CharacterClass[] = [
     element: 'Light',
     iconName: 'Sun',
     startingAbilities: ['strike', 'ray_of_light'],
-    startingWeaponId: 'heavy_club'
+    startingWeaponId: 'heavy_club',
+    requiredPrestige: 0
   },
   {
     id: 'necro',
@@ -252,9 +314,132 @@ export const CHARACTER_CLASSES: CharacterClass[] = [
     element: 'Dark',
     iconName: 'Skull',
     startingAbilities: ['gloom', 'dark_pulse'],
-    startingWeaponId: 'training_wand'
+    startingWeaponId: 'training_wand',
+    requiredPrestige: 0
+  },
+  {
+    id: 'sylvan',
+    name: 'Sylvan Archer',
+    description: 'Guardian of the forest. High dexterity.',
+    baseHp: 115,
+    baseMp: 70,
+    element: 'Nature',
+    iconName: 'Sprout',
+    startingAbilities: ['quick_slash', 'vine_whip'],
+    startingWeaponId: 'chipped_dagger',
+    requiredPrestige: 0
+  },
+  {
+    id: 'ironclad',
+    name: 'Ironclad',
+    description: 'A walking tank made of steel.',
+    baseHp: 200,
+    baseMp: 20,
+    element: 'Metal',
+    iconName: 'Hammer',
+    startingAbilities: ['strike', 'iron_fist'],
+    startingWeaponId: 'heavy_club',
+    requiredPrestige: 0
+  },
+  {
+    id: 'bloodmage',
+    name: 'Blood Mage',
+    description: 'Sacrifices health for power. Dangerous.',
+    baseHp: 140,
+    baseMp: 90,
+    element: 'Blood',
+    iconName: 'Droplets',
+    startingAbilities: ['claw_rake', 'transfusion'],
+    startingWeaponId: 'chipped_dagger',
+    requiredPrestige: 0
+  },
+  {
+    id: 'chrono',
+    name: 'Time Walker',
+    description: 'Manipulates time to evade and strike.',
+    baseHp: 105,
+    baseMp: 100,
+    element: 'Time',
+    iconName: 'Clock',
+    startingAbilities: ['quick_slash', 'tick_tock'],
+    startingWeaponId: 'training_wand',
+    requiredPrestige: 0
+  },
+  {
+    id: 'arcanist',
+    name: 'Arcanist',
+    description: 'Scholar of pure magic energy.',
+    baseHp: 95,
+    baseMp: 120,
+    element: 'Arcane',
+    iconName: 'Book',
+    startingAbilities: ['magic_missile', 'mystic_orb'],
+    startingWeaponId: 'training_wand',
+    requiredPrestige: 0
+  },
+
+  // --- PRESTIGE GOD CLASSES ---
+  {
+    id: 'celestial',
+    name: 'Celestial Paragon',
+    description: 'An entity of pure light and physical perfection.',
+    baseHp: 300,
+    baseMp: 150,
+    element: 'Light',
+    iconName: 'Sun',
+    startingAbilities: ['radiance', 'sunburst', 'divine_intervention'],
+    startingWeaponId: 'bringer_of_light',
+    requiredPrestige: 1
+  },
+  {
+    id: 'void_lord',
+    name: 'Void Lord',
+    description: 'Consumes existence. Darkness personified.',
+    baseHp: 250,
+    baseMp: 200,
+    element: 'Dark',
+    iconName: 'Ghost',
+    startingAbilities: ['void_ray', 'cataclysm', 'eclipse'],
+    startingWeaponId: 'void_edge',
+    requiredPrestige: 1
+  },
+  {
+    id: 'tempest',
+    name: 'Tempest God',
+    description: 'Commands storms of air and lightning.',
+    baseHp: 200,
+    baseMp: 220,
+    element: 'Lightning',
+    iconName: 'CloudLightning',
+    startingAbilities: ['chain_lightning', 'thor_wrath', 'hurricane'],
+    startingWeaponId: 'mjolnir',
+    requiredPrestige: 1
+  },
+  {
+    id: 'chronomancer',
+    name: 'Grand Chronomancer',
+    description: 'Weaves time to erase enemies from history.',
+    baseHp: 220,
+    baseMp: 250,
+    element: 'Time',
+    iconName: 'Hourglass',
+    startingAbilities: ['time_stop', 'paradox', 'future_strike'],
+    startingWeaponId: 'chronos_scepter',
+    requiredPrestige: 1
+  },
+  {
+    id: 'arcane_monarch',
+    name: 'Arcane Monarch',
+    description: 'The ruler of all magic.',
+    baseHp: 200,
+    baseMp: 300,
+    element: 'Arcane',
+    iconName: 'Crown',
+    startingAbilities: ['supernova_arcane', 'disintegrate', 'aether_ray'],
+    startingWeaponId: 'infinity_blade',
+    requiredPrestige: 1
   }
 ];
 
 export const BASE_XP_REQ = 50;
-export const XP_SCALING = 1.5;
+export const XP_SCALING = 1.3; // Increased scaling for better progression feel

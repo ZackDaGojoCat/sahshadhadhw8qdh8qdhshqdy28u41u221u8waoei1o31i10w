@@ -1,11 +1,12 @@
 
+
 import { Enemy, ElementType } from '../types';
 
 // --- PROCEDURAL DATA LISTS ---
 
-const ADJECTIVES_LOW = ["Weak", "Tiny", "Young", "Lost", "Tired", "Small", "Dusty"];
-const ADJECTIVES_MID = ["Wild", "Feral", "Dark", "Angry", "Cursed", "Strong", "Rabid", "Swift", "Brutal"];
-const ADJECTIVES_HIGH = ["Ancient", "Legendary", "Elder", "Giant", "Eternal", "Mythic", "Colossal", "Divine", "Infernal"];
+const ADJECTIVES_LOW = ["Weak", "Tiny", "Young", "Lost", "Tired", "Small", "Dusty", "Rusted", "Slow"];
+const ADJECTIVES_MID = ["Wild", "Feral", "Dark", "Angry", "Cursed", "Strong", "Rabid", "Swift", "Brutal", "Sharpened", "Bloody"];
+const ADJECTIVES_HIGH = ["Ancient", "Legendary", "Elder", "Giant", "Eternal", "Mythic", "Colossal", "Divine", "Infernal", "Timeless", "Cosmic"];
 
 const MONSTER_DATA: Record<string, { names: string[], icons: string[] }> = {
     Fire: { 
@@ -39,6 +40,26 @@ const MONSTER_DATA: Record<string, { names: string[], icons: string[] }> = {
     Dark: { 
         names: ['Shadow', 'Ghost', 'Skeleton', 'Vampire', 'Reaper', 'Shade', 'Necromancer', 'Lich'], 
         icons: ['Moon', 'Skull', 'Ghost', 'Eye'] 
+    },
+    Nature: {
+        names: ['Ent', 'Dryad', 'Maneater', 'Fungus', 'Scorpion', 'Spider', 'Mantis', 'Bear'],
+        icons: ['Flower', 'Trees', 'Sprout', 'Bug']
+    },
+    Metal: {
+        names: ['Automaton', 'Armor Suit', 'Tank', 'Mecha', 'Gargantua', 'Android', 'Blade', 'Golem'],
+        icons: ['Hammer', 'Shield', 'Settings', 'Bot']
+    },
+    Blood: {
+        names: ['Vampire', 'Leech', 'Mosquito', 'Bat', 'Hemogoblin', 'Cultist', 'Butcher', 'Parasite'],
+        icons: ['Droplets', 'Heart', 'Skull', 'Scissors']
+    },
+    Time: {
+        names: ['Chronos', 'Warp', 'Glitch', 'Paradox', 'Watcher', 'Shifter', 'Phantom', 'Echo'],
+        icons: ['Clock', 'Watch', 'Hourglass', 'Undo2']
+    },
+    Arcane: {
+        names: ['Wizard', 'Orb', 'Eye', 'Construct', 'Sorcerer', 'Illusion', 'Mind Flayer', 'Djinn'],
+        icons: ['Sparkles', 'Eye', 'Zap', 'Wand']
     },
     Physical: {
         names: ['Bandit', 'Warrior', 'Wolf', 'Bear', 'Knight', 'Mercenary', 'Rogue', 'Orc', 'Goblin'],
@@ -78,7 +99,10 @@ export const generateEnemy = async (playerLevel: number): Promise<Enemy> => {
     const adjective = getRandomElement(adjList);
 
     // 2. Determine Element (Random, weighted slightly towards different types)
-    const elements: ElementType[] = ['Fire', 'Water', 'Earth', 'Air', 'Lightning', 'Ice', 'Light', 'Dark', 'Physical'];
+    const elements: ElementType[] = [
+        'Fire', 'Water', 'Earth', 'Air', 'Lightning', 'Ice', 'Light', 'Dark', 'Physical',
+        'Nature', 'Metal', 'Blood', 'Time', 'Arcane'
+    ];
     const element = getRandomElement(elements);
     
     // 3. Pick Monster Name & Icon

@@ -11,13 +11,25 @@ interface AbilityCardProps {
   cooldownRemaining?: number;
 }
 
+// ✅ STRICT PATTERN: Fallback Component
+const FallbackIcon: React.FC<{ className?: string; size?: number }> = ({ className, size }) => (
+  <div className={`w-4 h-4 rounded-full bg-gray-500 ${className ?? ''}`} style={{ width: size, height: size }} />
+);
+
+// ✅ STRICT PATTERN: getIcon must return React.ElementType
+const getIcon = (name: string): React.ElementType => {
+  const icons = Icons as unknown as Record<string, React.ElementType | undefined>;
+  return icons[name] ?? Icons.CircleHelp ?? Icons.HelpCircle ?? Icons.AlertCircle ?? FallbackIcon;
+};
+
 export const AbilityCard: React.FC<AbilityCardProps> = ({ ability, onClick, disabled, isUnlocked = true, cooldownRemaining = 0 }) => {
-  // Dynamically get icon
-  const IconComponent = (Icons[ability.icon as keyof typeof Icons] || Icons.HelpCircle) as React.ElementType;
+  const IconComponent = getIcon(ability.icon);
   
   const colorClass = ELEMENT_COLORS[ability.element];
   const bgClass = ELEMENT_BG_COLORS[ability.element];
   const isOnCooldown = cooldownRemaining > 0;
+  
+  const fusionBorder = ability.isCustom ? 'border-2 border-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.3)]' : '';
 
   return (
     <button
@@ -30,7 +42,7 @@ export const AbilityCard: React.FC<AbilityCardProps> = ({ ability, onClick, disa
             ? 'border-slate-800 bg-slate-900/40' 
             : (disabled || isOnCooldown)
                 ? 'opacity-80 cursor-not-allowed border-slate-700 bg-slate-900' 
-                : `${colorClass} bg-opacity-5 hover:bg-opacity-10 border-opacity-30 hover:border-opacity-60 hover:-translate-y-0.5 shadow-sm hover:shadow-md cursor-pointer`
+                : `${colorClass} ${fusionBorder} bg-opacity-5 hover:bg-opacity-10 border-opacity-30 hover:border-opacity-60 hover:-translate-y-0.5 shadow-sm hover:shadow-md cursor-pointer`
         }
       `}
     >
@@ -40,13 +52,14 @@ export const AbilityCard: React.FC<AbilityCardProps> = ({ ability, onClick, disa
           {/* Icon Box */}
           <div className={`p-2 rounded-lg ${bgClass} text-white shrink-0 shadow-inner mt-0.5 relative`}>
             <IconComponent size={18} />
+            {ability.isCustom && <div className="absolute -top-1 -right-1 w-2 h-2 bg-pink-500 rounded-full animate-pulse"></div>}
           </div>
           
           {/* Text Content */}
           <div className="flex-1 min-w-0 flex flex-col h-full justify-between">
             <div>
                 <div className="flex justify-between items-center mb-0.5">
-                    <h4 className="font-bold text-sm text-slate-200 truncate pr-2 leading-none">{ability.name}</h4>
+                    <h4 className={`font-bold text-sm truncate pr-2 leading-none ${ability.isCustom ? 'text-pink-300' : 'text-slate-200'}`}>{ability.name}</h4>
                     <div className="flex flex-col items-end">
                          <span className="text-[10px] font-mono text-slate-500 font-bold whitespace-nowrap">
                             {ability.manaCost > 0 ? `${ability.manaCost} MP` : ''}
@@ -61,7 +74,7 @@ export const AbilityCard: React.FC<AbilityCardProps> = ({ ability, onClick, disa
             <div className="flex items-center gap-2 mt-1">
                  <div className={`w-1.5 h-1.5 rounded-full ${bgClass}`}></div>
                  <span className={`text-[9px] uppercase font-bold text-slate-500 tracking-wider`}>
-                    {ability.element}
+                    {ability.element} {ability.isCustom && '(FUSED)'}
                  </span>
                  {ability.damage && <span className="text-[9px] text-red-400/80 font-mono ml-auto">DMG {ability.damage}</span>}
                  {ability.heal && <span className="text-[9px] text-emerald-400/80 font-mono ml-auto">HEAL {ability.heal}</span>}

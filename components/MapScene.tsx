@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { MapCell, Position, Player } from '../types';
-import { User, Skull, Gift, Flag, Shield, Sparkles, Feather } from 'lucide-react';
+import * as Icons from 'lucide-react';
 import { ELEMENT_COLORS } from '../constants';
 
 interface MapSceneProps {
@@ -9,6 +9,17 @@ interface MapSceneProps {
   player: Player;
   onMove: (x: number, y: number) => void;
 }
+
+// ✅ STRICT PATTERN: Fallback Component
+const FallbackIcon: React.FC<{ className?: string; size?: number }> = ({ className, size }) => (
+  <div className={`w-4 h-4 rounded-full bg-gray-500 ${className ?? ''}`} style={{ width: size, height: size }} />
+);
+
+// ✅ STRICT PATTERN: getIcon must return React.ElementType
+const getIcon = (name: string): React.ElementType => {
+  const icons = Icons as unknown as Record<string, React.ElementType | undefined>;
+  return icons[name] ?? Icons.CircleHelp ?? Icons.HelpCircle ?? Icons.AlertCircle ?? FallbackIcon;
+};
 
 export const MapScene: React.FC<MapSceneProps> = ({ cells, playerPosition, player, onMove }) => {
   const MAP_SIZE = 8;
@@ -41,12 +52,21 @@ export const MapScene: React.FC<MapSceneProps> = ({ cells, playerPosition, playe
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onMove, isMoving]);
 
-  // Determine Icon based on class/iconName
-  const getPlayerIcon = () => {
-     if (player.iconName === 'Shield') return <Shield className="text-orange-400 drop-shadow-[0_0_5px_rgba(251,146,60,0.8)]" size={28} />;
-     if (player.iconName === 'Sparkles') return <Sparkles className="text-blue-400 drop-shadow-[0_0_5px_rgba(96,165,250,0.8)]" size={28} />;
-     if (player.iconName === 'Feather') return <Feather className="text-cyan-300 drop-shadow-[0_0_5px_rgba(103,232,249,0.8)]" size={28} />;
-     return <User className="text-white" size={28} />;
+  // Use Strict Pattern for Player Icon
+  const PlayerIcon = getIcon(player.iconName || 'User');
+  
+  // Specific icons for map elements
+  const SkullIcon = getIcon('Skull');
+  const GiftIcon = getIcon('Gift');
+  const FlagIcon = getIcon('Flag');
+  const UserIcon = getIcon('User'); // Fallback D-Pad
+
+  // Helper for dynamic coloring based on player icon name (mimicking old logic but safer)
+  const getPlayerColorClass = () => {
+     if (player.iconName === 'Shield') return "text-orange-400 drop-shadow-[0_0_5px_rgba(251,146,60,0.8)]";
+     if (player.iconName === 'Sparkles') return "text-blue-400 drop-shadow-[0_0_5px_rgba(96,165,250,0.8)]";
+     if (player.iconName === 'Feather') return "text-cyan-300 drop-shadow-[0_0_5px_rgba(103,232,249,0.8)]";
+     return "text-white";
   };
 
   return (
@@ -89,10 +109,10 @@ export const MapScene: React.FC<MapSceneProps> = ({ cells, playerPosition, playe
                         >
                              {isRevealed && (
                                 <>
-                                    {cell.type === 'enemy' && <Skull size={20} className="text-red-500 animate-pulse" />}
-                                    {cell.type === 'boss' && <Skull size={28} className="text-purple-500 animate-bounce" />}
-                                    {cell.type === 'treasure' && <Gift size={20} className="text-yellow-400 animate-float" />}
-                                    {cell.type === 'start' && <Flag size={16} className="text-green-500 opacity-50" />}
+                                    {cell.type === 'enemy' && <SkullIcon size={20} className="text-red-500 animate-pulse" />}
+                                    {cell.type === 'boss' && <SkullIcon size={28} className="text-purple-500 animate-bounce" />}
+                                    {cell.type === 'treasure' && <GiftIcon size={20} className="text-yellow-400 animate-float" />}
+                                    {cell.type === 'start' && <FlagIcon size={16} className="text-green-500 opacity-50" />}
                                 </>
                             )}
                             
@@ -123,7 +143,7 @@ export const MapScene: React.FC<MapSceneProps> = ({ cells, playerPosition, playe
                             ${isMoving ? 'scale-110' : 'animate-idle'}
                         `}
                     >
-                         {getPlayerIcon()}
+                         <PlayerIcon size={28} className={getPlayerColorClass()} />
                          {/* Simple shadow */}
                          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-1 bg-black/50 blur-[2px] rounded-full"></div>
                     </div>
@@ -136,13 +156,13 @@ export const MapScene: React.FC<MapSceneProps> = ({ cells, playerPosition, playe
       {/* D-PAD Controls */}
       <div className="grid grid-cols-3 gap-2 md:hidden">
          <div></div>
-         <button onClick={() => { onMove(0, -1); setIsMoving(true); }} className="p-4 bg-slate-800 rounded-lg active:bg-blue-600 transition-colors shadow-lg active:scale-95"><User size={24} className="rotate-0"/></button>
+         <button onClick={() => { onMove(0, -1); setIsMoving(true); }} className="p-4 bg-slate-800 rounded-lg active:bg-blue-600 transition-colors shadow-lg active:scale-95"><UserIcon size={24} className="rotate-0"/></button>
          <div></div>
-         <button onClick={() => { onMove(-1, 0); setIsMoving(true); }} className="p-4 bg-slate-800 rounded-lg active:bg-blue-600 transition-colors shadow-lg active:scale-95"><User size={24} className="-rotate-90"/></button>
+         <button onClick={() => { onMove(-1, 0); setIsMoving(true); }} className="p-4 bg-slate-800 rounded-lg active:bg-blue-600 transition-colors shadow-lg active:scale-95"><UserIcon size={24} className="-rotate-90"/></button>
          <div className="flex items-center justify-center text-slate-500 text-xs font-mono font-bold tracking-widest">MOVE</div>
-         <button onClick={() => { onMove(1, 0); setIsMoving(true); }} className="p-4 bg-slate-800 rounded-lg active:bg-blue-600 transition-colors shadow-lg active:scale-95"><User size={24} className="rotate-90"/></button>
+         <button onClick={() => { onMove(1, 0); setIsMoving(true); }} className="p-4 bg-slate-800 rounded-lg active:bg-blue-600 transition-colors shadow-lg active:scale-95"><UserIcon size={24} className="rotate-90"/></button>
          <div></div>
-         <button onClick={() => { onMove(0, 1); setIsMoving(true); }} className="p-4 bg-slate-800 rounded-lg active:bg-blue-600 transition-colors shadow-lg active:scale-95"><User size={24} className="rotate-180"/></button>
+         <button onClick={() => { onMove(0, 1); setIsMoving(true); }} className="p-4 bg-slate-800 rounded-lg active:bg-blue-600 transition-colors shadow-lg active:scale-95"><UserIcon size={24} className="rotate-180"/></button>
          <div></div>
       </div>
       

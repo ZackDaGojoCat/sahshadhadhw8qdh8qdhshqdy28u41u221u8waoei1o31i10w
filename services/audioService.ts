@@ -1,4 +1,5 @@
 
+
 // Advanced Synth Service using Web Audio API
 
 const getAudioContext = () => {
@@ -126,52 +127,64 @@ export const playSfx = (type: 'attack' | 'hit' | 'heal' | 'victory' | 'defeat' |
             // VISUALIZE THE ELEMENT THROUGH SOUND
             switch(element) {
                 case 'Physical':
-                    // Swoosh / Metal scrape
                     playNoiseBurst(0.15, 'highpass', 600, 2000, 0.3);
                     playSweep(200, 50, 0.1, 'sawtooth', 0.1);
                     break;
                 case 'Fire':
-                    // Crackle & Roar
-                    playNoiseBurst(0.6, 'lowpass', 400, 100, 0.4); // Rumble
-                    playNoiseBurst(0.3, 'highpass', 1000, 3000, 0.2); // Crackle
+                    playNoiseBurst(0.6, 'lowpass', 400, 100, 0.4); 
+                    playNoiseBurst(0.3, 'highpass', 1000, 3000, 0.2); 
                     break;
                 case 'Water':
-                    // Bubble / Splash
                     playSweep(400, 800, 0.2, 'sine', 0.2);
                     playNoiseBurst(0.4, 'lowpass', 800, 200, 0.2);
                     break;
                 case 'Earth':
-                    // Deep Thud / Rumble
                     playNoiseBurst(0.5, 'lowpass', 150, 50, 0.6);
                     playTone(60, 'square', 0.3, 0.2);
                     break;
                 case 'Air':
-                    // Wind Sweep
                     playNoiseBurst(0.5, 'bandpass', 400, 1200, 0.2);
                     break;
                 case 'Lightning':
-                    // Zap / Static
                     playTone(600, 'sawtooth', 0.1, 0.1);
                     playSweep(1500, 100, 0.2, 'sawtooth', 0.15);
                     break;
                 case 'Ice':
-                    // Chime / Shatter
                     playTone(1200, 'sine', 0.3, 0.1);
                     playTone(1800, 'triangle', 0.1, 0.1);
                     playNoiseBurst(0.2, 'highpass', 2000, 4000, 0.1);
                     break;
                 case 'Light':
-                    // Holy Chord / Laser
-                    playTone(440, 'sine', 0.5, 0.1); // A4
-                    playTone(554, 'sine', 0.5, 0.1); // C#5
-                    playTone(659, 'sine', 0.5, 0.1); // E5
+                    playTone(440, 'sine', 0.5, 0.1); 
+                    playTone(554, 'sine', 0.5, 0.1); 
+                    playTone(659, 'sine', 0.5, 0.1); 
                     playSweep(800, 1200, 0.3, 'sine', 0.1);
                     break;
                 case 'Dark':
-                    // Dissonant / Void
                     playTone(100, 'sawtooth', 0.6, 0.2);
-                    playTone(145, 'sawtooth', 0.6, 0.1, 10); // Detuned tritone-ish
+                    playTone(145, 'sawtooth', 0.6, 0.1, 10);
                     playSweep(200, 50, 0.5, 'square', 0.1);
+                    break;
+                case 'Nature':
+                    playNoiseBurst(0.4, 'lowpass', 500, 200, 0.2); // Rustling
+                    playSweep(300, 600, 0.3, 'triangle', 0.1); // Growth
+                    break;
+                case 'Metal':
+                    playTone(800, 'square', 0.05, 0.3); // Clank
+                    playTone(1200, 'square', 0.05, 0.2, 5); // Clink
+                    break;
+                case 'Blood':
+                    playNoiseBurst(0.3, 'lowpass', 200, 50, 0.3); // Squish
+                    playSweep(100, 300, 0.2, 'sawtooth', 0.1);
+                    break;
+                case 'Time':
+                    playTone(1000, 'sine', 0.05, 0.2); // Tick
+                    setTimeout(() => playTone(800, 'sine', 0.05, 0.2), 200); // Tock
+                    playSweep(2000, 500, 0.5, 'triangle', 0.1); // Warp
+                    break;
+                case 'Arcane':
+                    playSweep(100, 2000, 0.5, 'sine', 0.15); // Magic rise
+                    playTone(400, 'triangle', 0.4, 0.1, 50); // Vibrating tone
                     break;
                 default:
                     playNoiseBurst(0.1, 'allpass', 1000, 1000, 0.2);
@@ -179,44 +192,38 @@ export const playSfx = (type: 'attack' | 'hit' | 'heal' | 'victory' | 'defeat' |
             break;
 
         case 'hit':
-            // Impact sound based on element
-            if (element === 'Earth' || element === 'Physical') {
-                playNoiseBurst(0.1, 'lowpass', 300, 50, 0.5); // Thud
-            } else if (element === 'Lightning' || element === 'Fire') {
-                playNoiseBurst(0.1, 'highpass', 500, 1000, 0.2); // Sizzle
+            if (element === 'Metal' || element === 'Ice') {
+                playNoiseBurst(0.1, 'highpass', 2000, 500, 0.3); // Sharp hit
+            } else if (element === 'Blood' || element === 'Water') {
+                playNoiseBurst(0.1, 'lowpass', 400, 100, 0.4); // Wet hit
             } else {
                 playNoiseBurst(0.1, 'bandpass', 200, 800, 0.3); // Generic hit
             }
             break;
 
         case 'heal':
-            // Rising magical chime
             playTone(400, 'sine', 0.5, 0.1);
             setTimeout(() => playTone(500, 'sine', 0.5, 0.1), 100);
             setTimeout(() => playTone(600, 'sine', 0.5, 0.1), 200);
             break;
 
         case 'victory':
-            // Major Arpeggio
             [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
                 setTimeout(() => playTone(freq, 'triangle', 0.4, 0.2), i * 100);
             });
             break;
 
         case 'defeat':
-            // Descending Minor
             [440, 415, 392, 349].forEach((freq, i) => {
                 setTimeout(() => playTone(freq, 'sawtooth', 0.5, 0.2), i * 150);
             });
             break;
 
         case 'ui':
-            // Click
             playTone(1200, 'sine', 0.03, 0.05);
             break;
 
         case 'revive':
-            // Angelic rise
             playSweep(220, 880, 1.0, 'triangle', 0.2);
             playTone(440, 'sine', 1.0, 0.1);
             break;

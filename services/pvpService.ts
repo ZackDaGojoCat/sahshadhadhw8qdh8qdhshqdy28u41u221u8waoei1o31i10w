@@ -1,17 +1,24 @@
 import { Player, Enemy, Weapon } from '../types';
 import { WEAPONS } from '../constants';
 
+// Simplified PVP Payload
+interface PvpPayload {
+  n: string; // name
+  l: number; // level
+  e: string; // element
+  c: string; // classId
+  w: string; // weaponId
+  p: number; // prestige
+}
+
 export const encodePlayerToCode = (player: Player): string => {
-  const pvpData = {
+  const pvpData: PvpPayload = {
     n: player.name,
     l: player.level,
-    hp: player.maxHp,
-    mp: player.maxMp,
     e: player.element,
-    i: player.iconName,
     c: player.classId,
-    a: player.unlockedAbilities, // Unlocked abilities
-    w: player.weapon.id // Equipped weapon ID
+    w: player.weapon.id,
+    p: player.prestige
   };
   
   try {
@@ -25,30 +32,37 @@ export const encodePlayerToCode = (player: Player): string => {
 
 export const decodeCodeToEnemy = (code: string): Enemy | null => {
   try {
-    const jsonStr = atob(code);
-    const data = JSON.parse(jsonStr);
+    // Basic clean up of potential whitespace
+    const cleanCode = code.trim();
+    const jsonStr = atob(cleanCode);
+    const data = JSON.parse(jsonStr) as PvpPayload;
 
-    // Validate required fields roughly
-    if (!data.n || !data.hp) return null;
+    // Validate required fields
+    if (!data.n || !data.l || !data.c) return null;
 
+    // Reconstruct stats based on level + prestige
+    // We recreate the stats dynamically so the code is short
+    const prestigeMult = 1 + (data.p * 0.5);
+    const baseHp = 100 + (data.l * 30);
+    const maxHp = Math.floor(baseHp * prestigeMult);
+    
     // Reconstruct weapon
     const weapon = WEAPONS.find(w => w.id === data.w) || WEAPONS[0];
 
     return {
-      name: `Challenger ${data.n}`,
-      description: `A level ${data.l} ${data.e} warrior wielding ${weapon.name}.`,
-      maxHp: data.hp,
-      currentHp: data.hp, // Start fresh
-      maxMp: data.mp,
-      currentMp: data.mp,
+      name: `Rival ${data.n}`,
+      description: `Lvl ${data.l} ${data.e} [Prestige ${data.p}]`,
+      maxHp: maxHp,
+      currentHp: maxHp, 
+      maxMp: 100 + (data.l * 10),
+      currentMp: 100 + (data.l * 10),
       level: data.l,
-      element: data.e,
-      iconName: data.i,
-      xpReward: data.l * 80, // Higher XP reward for PvP
-      goldReward: data.l * 40,
+      element: data.e as any,
+      iconName: 'Swords', // Generic PvP icon or derive from class
+      xpReward: data.l * 100 * prestigeMult,
+      goldReward: data.l * 50 * prestigeMult,
       isPvP: true,
       isBoss: false,
-      pvpAbilities: data.a || [],
       pvpWeapon: weapon
     };
   } catch (e) {

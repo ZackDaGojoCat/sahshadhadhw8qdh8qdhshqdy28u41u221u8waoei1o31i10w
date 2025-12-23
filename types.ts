@@ -1,6 +1,5 @@
 
-
-export type ElementType = 'Physical' | 'Fire' | 'Water' | 'Earth' | 'Air' | 'Lightning' | 'Ice' | 'Light' | 'Dark';
+export type ElementType = 'Physical' | 'Fire' | 'Water' | 'Earth' | 'Air' | 'Lightning' | 'Ice' | 'Light' | 'Dark' | 'Nature' | 'Metal' | 'Blood' | 'Time' | 'Arcane';
 
 export interface Ability {
   id: string;
@@ -13,6 +12,7 @@ export interface Ability {
   cooldown: number; // Turns to wait
   unlockLevel: number;
   icon: string; 
+  isCustom?: boolean; // NEW: Track if fused
 }
 
 export interface Weapon {
@@ -21,7 +21,7 @@ export interface Weapon {
   damage: number;
   element: ElementType;
   icon: string;
-  rarity: 'common' | 'rare' | 'legendary';
+  rarity: 'common' | 'rare' | 'legendary' | 'godly';
   price: number; // New: Cost in Gold
 }
 
@@ -35,6 +35,7 @@ export interface CharacterClass {
   iconName: string; 
   startingAbilities: string[];
   startingWeaponId: string;
+  requiredPrestige: number; // NEW: Unlock condition
 }
 
 export interface Entity {
@@ -52,23 +53,25 @@ export interface Entity {
 export interface Player extends Entity {
   xp: number;
   maxXp: number;
-  gold: number; // New: Currency
+  gold: number; 
   unlockedAbilities: string[]; 
+  customAbilities: Ability[]; // NEW: Store fused spells here
   classId: string;
   weapon: Weapon;
-  winStreak: number; // Track consecutive wins
+  winStreak: number; 
+  prestige: number; // NEW: Ascension level
 }
 
 export interface Enemy extends Entity {
   description: string;
   xpReward: number;
-  goldReward: number; // New: Gold drop
+  goldReward: number; 
   isPvP?: boolean; 
   pvpAbilities?: string[]; 
   pvpWeapon?: Weapon; 
 }
 
-export type GameState = 'MENU' | 'CHARACTER_SELECT' | 'TOWN' | 'SHOP' | 'COMBAT' | 'VICTORY' | 'DEFEAT' | 'PVP_MENU';
+export type GameState = 'CHARACTER_SELECT' | 'TOWN' | 'SHOP' | 'COMBAT' | 'VICTORY' | 'DEFEAT' | 'PVP_MENU' | 'ELEMENT_CHANGE' | 'FUSION' | 'ONLINE_LOBBY';
 
 export interface CombatLogEntry {
   id: string;
@@ -102,4 +105,24 @@ export interface MapCell {
   y: number;
   type: 'empty' | 'wall' | 'start' | 'enemy' | 'treasure' | 'boss';
   isRevealed: boolean;
+}
+
+// --- P2P TYPES ---
+export type P2PMessageType = 'HANDSHAKE' | 'ATTACK' | 'TURN_END' | 'DEFEAT' | 'VICTORY';
+
+export interface P2PMessage {
+  type: P2PMessageType;
+  payload?: any;
+}
+
+export interface HandshakePayload {
+  player: Player;
+}
+
+export interface AttackPayload {
+  abilityName: string;
+  damage: number;
+  heal: number;
+  isCritical: boolean;
+  element: ElementType;
 }
