@@ -1,3 +1,4 @@
+
 import { Ability, ElementType, CharacterClass, Weapon } from './types';
 
 export const ELEMENT_COLORS: Record<ElementType, string> = {
@@ -110,14 +111,14 @@ export const ABILITIES: Ability[] = [
   { id: 'supernova', name: 'Supernova', description: 'A blinding explosion.', element: 'Fire', manaCost: 70, damage: 120, cooldown: 4, unlockLevel: 6, icon: 'Sun' },
   { id: 'inferno', name: 'Hellfire', description: 'Engulf the enemy in a firestorm.', element: 'Fire', manaCost: 90, damage: 150, cooldown: 5, unlockLevel: 7, icon: 'Zap' },
 
-  // --- WATER (7) ---
-  { id: 'bubble', name: 'Water Bubble', description: 'A simple burst of water.', element: 'Water', manaCost: 10, damage: 15, cooldown: 0, unlockLevel: 1, icon: 'Droplets' },
+  // --- WATER (7) - BUFFED ---
+  { id: 'bubble', name: 'Water Bubble', description: 'A concentrated burst of water.', element: 'Water', manaCost: 10, damage: 25, cooldown: 0, unlockLevel: 1, icon: 'Droplets' },
   { id: 'heal', name: 'Mend', description: 'Restore health with magic.', element: 'Water', manaCost: 30, heal: 50, damage: 0, cooldown: 3, unlockLevel: 2, icon: 'Heart' },
-  { id: 'aqua_jet', name: 'Aqua Jet', description: 'High pressure water stream.', element: 'Water', manaCost: 25, damage: 45, cooldown: 2, unlockLevel: 3, icon: 'Droplets' },
-  { id: 'whirlpool', name: 'Whirlpool', description: 'Trap the enemy in a spin.', element: 'Water', manaCost: 40, damage: 60, cooldown: 3, unlockLevel: 4, icon: 'RotateCw' },
-  { id: 'tidal_strike', name: 'Tidal Wave', description: 'Crash into the foe like the ocean.', element: 'Water', manaCost: 50, damage: 80, cooldown: 3, unlockLevel: 5, icon: 'Waves' },
-  { id: 'leviathan', name: 'Leviathans Call', description: 'Summon a beast from the deep.', element: 'Water', manaCost: 70, damage: 110, cooldown: 4, unlockLevel: 6, icon: 'Anchor' },
-  { id: 'tsunami', name: 'Tsunami', description: 'Drown the enemy in power.', element: 'Water', manaCost: 85, damage: 140, cooldown: 5, unlockLevel: 7, icon: 'CloudRain' },
+  { id: 'aqua_jet', name: 'Aqua Jet', description: 'High pressure water stream.', element: 'Water', manaCost: 25, damage: 55, cooldown: 2, unlockLevel: 3, icon: 'Droplets' },
+  { id: 'whirlpool', name: 'Whirlpool', description: 'Trap the enemy in a spin.', element: 'Water', manaCost: 40, damage: 70, cooldown: 3, unlockLevel: 4, icon: 'RotateCw' },
+  { id: 'tidal_strike', name: 'Tidal Wave', description: 'Crash into the foe like the ocean.', element: 'Water', manaCost: 50, damage: 95, cooldown: 3, unlockLevel: 5, icon: 'Waves' },
+  { id: 'leviathan', name: 'Leviathans Call', description: 'Summon a beast from the deep.', element: 'Water', manaCost: 70, damage: 130, cooldown: 4, unlockLevel: 6, icon: 'Anchor' },
+  { id: 'tsunami', name: 'Tsunami', description: 'Drown the enemy in power.', element: 'Water', manaCost: 85, damage: 165, cooldown: 5, unlockLevel: 7, icon: 'CloudRain' },
 
   // --- EARTH (7) ---
   { id: 'pebble', name: 'Pebble Shot', description: 'Flick a stone at speed.', element: 'Earth', manaCost: 5, damage: 12, cooldown: 0, unlockLevel: 1, icon: 'Circle' },
@@ -236,12 +237,12 @@ export const CHARACTER_CLASSES: CharacterClass[] = [
   {
     id: 'mage',
     name: 'Tide Caller',
-    description: 'A master of water magic and healing.',
+    description: 'A master of water magic.',
     baseHp: 90,
     baseMp: 100,
     element: 'Water',
     iconName: 'Sparkles',
-    startingAbilities: ['quick_slash', 'heal'],
+    startingAbilities: ['bubble', 'heal'], // Changed to Bubble to give damage start
     startingWeaponId: 'training_wand',
     requiredPrestige: 0
   },
@@ -442,4 +443,4 @@ export const CHARACTER_CLASSES: CharacterClass[] = [
 ];
 
 export const BASE_XP_REQ = 50;
-export const XP_SCALING = 1.3; // Increased scaling for better progression feel
+export const XP_SCALING = 1.3;

@@ -12,7 +12,7 @@ export interface Ability {
   cooldown: number; // Turns to wait
   unlockLevel: number;
   icon: string; 
-  isCustom?: boolean; // NEW: Track if fused
+  isCustom?: boolean; // Fused abilities
 }
 
 export interface Weapon {
@@ -54,12 +54,13 @@ export interface Player extends Entity {
   xp: number;
   maxXp: number;
   gold: number; 
-  unlockedAbilities: string[]; 
-  customAbilities: Ability[]; // NEW: Store fused spells here
+  unlockedAbilities: string[];
+  customAbilities: Ability[]; 
   classId: string;
   weapon: Weapon;
   winStreak: number; 
   prestige: number; // NEW: Ascension level
+  lastEvolvedLevel: number; // NEW: Tracks when we last changed element
 }
 
 export interface Enemy extends Entity {
@@ -71,7 +72,7 @@ export interface Enemy extends Entity {
   pvpWeapon?: Weapon; 
 }
 
-export type GameState = 'CHARACTER_SELECT' | 'TOWN' | 'SHOP' | 'COMBAT' | 'VICTORY' | 'DEFEAT' | 'PVP_MENU' | 'ELEMENT_CHANGE' | 'FUSION' | 'ONLINE_LOBBY';
+export type GameState = 'CHARACTER_SELECT' | 'TOWN' | 'SHOP' | 'COMBAT' | 'VICTORY' | 'DEFEAT' | 'PVP_MENU' | 'ELEMENT_CHANGE' | 'ONLINE_LOBBY' | 'FUSION';
 
 export interface CombatLogEntry {
   id: string;
@@ -93,6 +94,7 @@ export interface VisualEffect {
   element: ElementType;
   source: 'player' | 'enemy';
   target: 'player' | 'enemy';
+  abilityId?: string; // NEW: Allows specific VFX per ability
 }
 
 export interface Position {

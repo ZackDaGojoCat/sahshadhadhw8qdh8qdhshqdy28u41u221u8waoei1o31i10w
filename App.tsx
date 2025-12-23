@@ -25,7 +25,7 @@ const getIcon = (name: string): React.ElementType => {
 };
 
 const DEFAULT_WEAPON = WEAPONS[0];
-const SAVE_KEY = 'EO_SAVE_V5_FUSION'; // Updated save key
+const SAVE_KEY = 'EO_SAVE_V6_EVO'; // Updated save key
 const FUSION_COST = 500;
 
 // Replaced constant with a function to ensure fresh state on reset
@@ -36,7 +36,7 @@ const getInitialPlayer = (): Player => ({
     level: 1, xp: 0, maxXp: 0, gold: 0,
     element: 'Physical', unlockedAbilities: [], customAbilities: [],
     iconName: 'User', classId: '', weapon: DEFAULT_WEAPON,
-    winStreak: 0, prestige: 0
+    winStreak: 0, prestige: 0, lastEvolvedLevel: 0
 });
 
 const App: React.FC = () => {
@@ -81,8 +81,9 @@ const App: React.FC = () => {
       if (saved) {
           try {
               const loadedPlayer = JSON.parse(saved);
-              // Migration check for customAbilities
+              // Migration checks
               if (!loadedPlayer.customAbilities) loadedPlayer.customAbilities = [];
+              if (loadedPlayer.lastEvolvedLevel === undefined) loadedPlayer.lastEvolvedLevel = 0;
               setPlayer(loadedPlayer);
               setGameState('TOWN');
           } catch(e) {
@@ -300,7 +301,8 @@ const App: React.FC = () => {
           iconName: charClass.iconName,
           classId: charClass.id,
           weapon: startingWeapon,
-          winStreak: 0
+          winStreak: 0,
+          lastEvolvedLevel: 0
       };
 
       setPlayer(newPlayer);
@@ -374,7 +376,14 @@ const App: React.FC = () => {
 
     // HEAL LOGIC
     if (ability.heal) {
-        setActiveEffect({ id: 'heal', type: 'heal', element: ability.element, source: 'player', target: 'player' });
+        setActiveEffect({ 
+            id: 'heal', 
+            type: 'heal', 
+            element: ability.element, 
+            source: 'player', 
+            target: 'player',
+            abilityId: ability.id // Pass ID
+        });
         
         const healAmount = ability.heal! + (player.level * 8);
         
@@ -409,12 +418,27 @@ const App: React.FC = () => {
     setCombatPhase('player_lunge');
 
     setTimeout(() => {
-        setActiveEffect({ id: 'atk-proj', type: 'projectile', element: ability.element, source: 'player', target: 'enemy' });
+        // PASS ABILITY ID HERE FOR UNIQUE VFX
+        setActiveEffect({ 
+            id: 'atk-proj', 
+            type: 'projectile', 
+            element: ability.element, 
+            source: 'player', 
+            target: 'enemy',
+            abilityId: ability.id 
+        });
         
         const { damage, isCritical } = calculateDamage(player.level, ability.damage || 0, ability.element, enemy.element, player.weapon.damage);
         
         setTimeout(() => {
-            setActiveEffect({ id: 'atk-impact', type: 'impact', element: ability.element, source: 'player', target: 'enemy' });
+            setActiveEffect({ 
+                id: 'atk-impact', 
+                type: 'impact', 
+                element: ability.element, 
+                source: 'player', 
+                target: 'enemy',
+                abilityId: ability.id 
+            });
             
             // Apply damage locally to enemy visual
             setEnemy(e => e ? { ...e, currentHp: Math.max(0, e.currentHp - damage) } : null);
@@ -604,10 +628,16 @@ const App: React.FC = () => {
               element: newElement,
               unlockedAbilities: newAbilities,
               currentHp: p.maxHp, // Full heal as bonus
-              currentMp: p.maxMp
+              currentMp: p.maxMp,
+              lastEvolvedLevel: p.level // Update milestone so we aren't asked again
           };
       });
       setGameState('TOWN');
+  };
+
+  const handleKeepElement = () => {
+    setPlayer(p => ({ ...p, lastEvolvedLevel: p.level })); // Mark this milestone as handled
+    setGameState('TOWN');
   };
 
   const returnToTown = () => {
@@ -653,6 +683,7 @@ const App: React.FC = () => {
           prestige: p.prestige + 1,
           xp: 0,
           maxXp: BASE_XP_REQ,
+          lastEvolvedLevel: 0
       }));
       setGameState('CHARACTER_SELECT');
   };
@@ -1009,7 +1040,7 @@ const App: React.FC = () => {
                          )
                      })}
                  </div>
-                 <button onClick={() => setGameState('TOWN')} className="mt-8 text-slate-500 hover:text-white underline">Keep Current Element</button>
+                 <button onClick={handleKeepElement} className="mt-8 text-slate-500 hover:text-white underline">Keep Current Element</button>
             </div>
         )}
 
@@ -1236,7 +1267,8 @@ const App: React.FC = () => {
                             {gameState === 'VICTORY' && (
                                 <div className="flex gap-2 mt-4">
                                     {/* Disable Element Evolve in PvP */}
-                                    {(!isOnline && player.level % 5 === 0 && player.level > 1) ? (
+                                    {/* ONLY SHOW IF we haven't evolved for this milestone yet */}
+                                    {(!isOnline && player.level % 5 === 0 && player.level > 1 && player.lastEvolvedLevel < player.level) ? (
                                         <button onClick={() => setGameState('ELEMENT_CHANGE')} className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold rounded-lg transition-all animate-pulse border border-white/20">
                                             ✨ EVOLVE ELEMENT ✨
                                         </button>

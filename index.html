@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -129,6 +130,40 @@
         100% { transform: scale(2); opacity: 0; }
       }
       .vfx-implode { animation: skill-implode 0.6s ease-in-out forwards; }
+
+      /* --- NEW ADVANCED VFX --- */
+      @keyframes glitch-anim {
+        0% { clip-path: inset(50% 0 30% 0); transform: translate(-2px, 2px); opacity: 0.8; }
+        20% { clip-path: inset(10% 0 60% 0); transform: translate(2px, -2px); opacity: 1; }
+        40% { clip-path: inset(80% 0 5% 0); transform: translate(-2px, 2px); opacity: 0.8; }
+        60% { clip-path: inset(15% 0 40% 0); transform: translate(2px, -2px); opacity: 1; }
+        80% { clip-path: inset(60% 0 20% 0); transform: translate(-1px, 1px); opacity: 0.8; }
+        100% { clip-path: inset(0% 0 0% 0); transform: translate(0); opacity: 1; }
+      }
+      .animate-glitch {
+        animation: glitch-anim 0.4s infinite linear alternate-reverse;
+      }
+      
+      @keyframes nuke-expand {
+        0% { transform: scale(0); opacity: 1; }
+        50% { transform: scale(5); opacity: 1; }
+        100% { transform: scale(8); opacity: 0; }
+      }
+      .animate-nuke { animation: nuke-expand 0.8s ease-out forwards; }
+
+      @keyframes tsunami-wave {
+        0% { transform: translateX(100px) scaleY(0.2); opacity: 0; }
+        30% { transform: translateX(0) scaleY(1.2); opacity: 1; }
+        100% { transform: translateX(-100px) scaleY(0.5); opacity: 0; }
+      }
+      .animate-tsunami { animation: tsunami-wave 0.8s ease-out forwards; }
+
+      @keyframes void-pulse {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7); }
+        50% { transform: scale(0.95); box-shadow: 0 0 50px 20px rgba(76, 29, 149, 0.5); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+      }
+      .animate-void { animation: void-pulse 1s infinite; }
 
       /* --- Prestige Effects --- */
       @keyframes rainbow-border {

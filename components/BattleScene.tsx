@@ -30,7 +30,7 @@ const ParticleSystem: React.FC<{ element: ElementType; x: number; y: number }> =
     const [particles, setParticles] = useState<Array<{ id: number; style: React.CSSProperties; className: string }>>([]);
 
     useEffect(() => {
-        const count = 12;
+        const count = 16; 
         const newParticles = [];
         
         const colors: Record<string, string> = {
@@ -41,7 +41,6 @@ const ParticleSystem: React.FC<{ element: ElementType; x: number; y: number }> =
         };
         const color = colors[element] || '#fff';
 
-        // Different behavior per element
         let animationType = 'particle-explode';
         if (element === 'Fire' || element === 'Dark' || element === 'Arcane') animationType = 'particle-spiral';
         if (element === 'Water' || element === 'Blood' || element === 'Ice') animationType = 'particle-rain';
@@ -49,7 +48,7 @@ const ParticleSystem: React.FC<{ element: ElementType; x: number; y: number }> =
 
         for (let i = 0; i < count; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const velocity = 50 + Math.random() * 100;
+            const velocity = 50 + Math.random() * 120;
             const tx = Math.cos(angle) * velocity;
             const ty = Math.sin(angle) * velocity;
             
@@ -60,11 +59,12 @@ const ParticleSystem: React.FC<{ element: ElementType; x: number; y: number }> =
                     backgroundColor: color,
                     left: `${x}px`,
                     top: `${y}px`,
+                    boxShadow: `0 0 6px ${color}`, 
                     // @ts-ignore
                     '--tx': `${tx}px`,
                     '--ty': `${ty}px`,
-                    '--ox': `${(Math.random() - 0.5) * 50}px`,
-                    '--size': `${3 + Math.random() * 5}px`
+                    '--ox': `${(Math.random() - 0.5) * 80}px`, 
+                    '--size': `${4 + Math.random() * 6}px`
                 }
             });
         }
@@ -79,6 +79,27 @@ const ParticleSystem: React.FC<{ element: ElementType; x: number; y: number }> =
         </div>
     );
 };
+
+// --- SPECIAL VFX COMPONENTS ---
+const GlitchEffect: React.FC = () => (
+    <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center">
+        <div className="text-9xl font-black text-fuchsia-500 opacity-50 animate-glitch mix-blend-screen" style={{ transform: 'translateX(-5px)' }}>ERROR</div>
+        <div className="text-9xl font-black text-cyan-500 opacity-50 animate-glitch mix-blend-screen" style={{ transform: 'translateX(5px)', animationDirection: 'reverse' }}>TIME</div>
+        <div className="absolute inset-0 bg-fuchsia-900/20 mix-blend-overlay"></div>
+    </div>
+);
+
+const NukeEffect: React.FC<{ color: string }> = ({ color }) => (
+    <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+        <div className="w-full h-full rounded-full animate-nuke" style={{ background: `radial-gradient(circle, ${color} 0%, transparent 70%)` }}></div>
+    </div>
+);
+
+const TsunamiEffect: React.FC = () => (
+    <div className="absolute inset-0 z-50 pointer-events-none overflow-hidden">
+        <div className="w-[150%] h-full bg-blue-500/60 animate-tsunami absolute top-0 left-[-25%] skew-x-12 backdrop-blur-sm border-r-4 border-white/50"></div>
+    </div>
+);
 
 const Avatar: React.FC<{ 
     iconName?: string, 
@@ -100,7 +121,6 @@ const Avatar: React.FC<{
     const glowColor = ELEMENT_COLORS[element].split(' ')[3]; 
     const borderColor = ELEMENT_COLORS[element].split(' ')[1]; 
     
-    // Prestige Glows
     const prestigeClass = prestige > 0 ? 'prestige-border' : '';
     
     return (
@@ -143,8 +163,6 @@ const Avatar: React.FC<{
                     PVP
                 </div>
             )}
-            
-            {/* Level Badge */}
             {level !== undefined && (
                 <div className={`absolute -bottom-1 ${isEnemy ? '-left-1' : '-right-1'} z-20 bg-slate-950 border border-slate-700 rounded-full px-2 py-0.5 shadow-lg flex items-center gap-1`}>
                     <span className="text-[10px] text-slate-400 font-bold">Lvl</span>
@@ -156,27 +174,48 @@ const Avatar: React.FC<{
 };
 
 const VFXLayer: React.FC<{ activeEffect: VisualEffect }> = ({ activeEffect }) => {
-    const { type, element, target } = activeEffect;
+    const { type, element, target, abilityId } = activeEffect;
     const isTargetPlayer = target === 'player';
     const positionClass = isTargetPlayer ? 'left-[20%]' : 'right-[20%]';
 
-    const getVfxIcon = (names: string[]): React.ElementType => {
-        // Cast to any for build safety
-        const icons = Icons as any;
-        for (const name of names) {
-            if (icons[name]) return icons[name]!;
-        }
-        return icons.Sparkles ?? FallbackIcon;
-    };
+    // --- 1. CHECK FOR SPECIAL ABILITY OVERRIDES FIRST ---
+    if (abilityId === 'paradox' || abilityId === 'time_stop' || abilityId === 'future_strike') {
+        return <GlitchEffect />;
+    }
 
-    // --- UNIQUE ELEMENT ANIMATIONS ---
+    if (abilityId === 'supernova' || abilityId === 'supernova_arcane') {
+        return <NukeEffect color={element === 'Fire' ? '#f97316' : '#ec4899'} />;
+    }
+    
+    if (abilityId === 'tsunami' || abilityId === 'tidal_strike' || abilityId === 'leviathan') {
+        return <TsunamiEffect />;
+    }
+
+    if (abilityId === 'void_ray' || abilityId === 'cataclysm' || abilityId === 'black_hole') {
+         return (
+            <div className={`absolute top-1/2 -translate-y-1/2 ${positionClass} z-50 pointer-events-none flex items-center justify-center`}>
+                <div className="w-64 h-64 bg-black rounded-full animate-void border-4 border-purple-900 shadow-[0_0_50px_#000]"></div>
+                <Icons.Skull size={100} className="text-purple-500 absolute animate-pulse z-10" />
+            </div>
+         );
+    }
+    
+    if (abilityId === 'absolute_zero') {
+         return (
+            <div className="absolute inset-0 z-50 pointer-events-none bg-sky-300/20 backdrop-blur-[2px] flex items-center justify-center">
+                 <Icons.Snowflake size={200} className="text-white animate-spin-slow drop-shadow-[0_0_30px_rgba(255,255,255,0.8)]" />
+            </div>
+         );
+    }
+
+    // --- 2. FALLBACK TO ELEMENTAL ANIMATIONS ---
     const renderEffect = () => {
         if (type === 'heal') {
              return (
                 <div className={`absolute ${activeEffect.source === 'player' ? 'left-[20%]' : 'right-[20%]'} top-1/2 -translate-y-1/2 z-50 pointer-events-none`}>
-                    <div className="absolute inset-0 -translate-x-1/2 -translate-y-1/2 w-40 h-40 animate-heal rounded-full border-4 border-emerald-400 opacity-0 shadow-[0_0_30px_rgba(52,211,153,0.6)]"></div>
+                    <div className="absolute inset-0 -translate-x-1/2 -translate-y-1/2 w-48 h-48 animate-heal rounded-full border-4 border-emerald-400 opacity-0 shadow-[0_0_50px_rgba(52,211,153,0.8)]"></div>
                     <div className="absolute inset-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center animate-float">
-                        <Icons.Plus size={48} className="text-emerald-300 drop-shadow-[0_0_10px_rgba(52,211,153,1)]" />
+                        <Icons.Plus size={64} className="text-emerald-300 drop-shadow-[0_0_20px_rgba(52,211,153,1)]" />
                     </div>
                 </div>
             );
@@ -185,77 +224,81 @@ const VFXLayer: React.FC<{ activeEffect: VisualEffect }> = ({ activeEffect }) =>
         return (
             <div className={`absolute top-1/2 -translate-y-1/2 ${positionClass} z-50 pointer-events-none flex items-center justify-center`}>
                 
-                {/* 1. Dynamic Particles based on element */}
                 <ParticleSystem element={element} x={0} y={0} />
 
-                {/* 2. Specific Large Icon Animation */}
                 {element === 'Physical' && (
                     <div className="relative w-48 h-48 flex items-center justify-center">
-                        <div className="vfx-slash absolute w-64 h-2 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,0.8)]"></div>
-                        <Icons.Sword size={64} className="text-zinc-200 animate-ping opacity-50 absolute" />
+                        <div className="vfx-slash absolute w-80 h-4 bg-white rounded-full shadow-[0_0_25px_rgba(255,255,255,1)]"></div>
+                        <Icons.Sword size={80} className="text-zinc-200 animate-ping opacity-70 absolute" />
                     </div>
                 )}
 
                 {element === 'Fire' && (
                     <div className="relative w-48 h-48 flex items-center justify-center">
-                         <div className="vfx-fire-pillar absolute w-16 h-48 bg-gradient-to-t from-orange-600 to-yellow-300 opacity-80 blur-md"></div>
-                         <Icons.Flame size={80} className="text-orange-200 animate-ping absolute" />
+                         <div className="vfx-fire-pillar absolute w-24 h-64 bg-gradient-to-t from-orange-600 via-yellow-500 to-transparent opacity-90 blur-lg"></div>
+                         <Icons.Flame size={100} className="text-orange-200 animate-ping absolute drop-shadow-[0_0_20px_rgba(251,146,60,1)]" />
                     </div>
                 )}
 
                 {element === 'Water' && (
                     <div className="relative w-48 h-48 flex items-center justify-center">
-                         <div className="absolute w-40 h-40 border-8 border-blue-400 rounded-full animate-ripple opacity-70"></div>
-                         <Icons.Droplets size={64} className="text-blue-300 animate-bounce absolute" />
+                         <div className="absolute w-56 h-56 border-8 border-blue-400 rounded-full animate-ripple opacity-80 shadow-[0_0_30px_rgba(59,130,246,0.6)]"></div>
+                         <Icons.Droplets size={80} className="text-blue-200 animate-bounce absolute drop-shadow-[0_0_20px_rgba(59,130,246,1)]" />
                     </div>
                 )}
 
                 {element === 'Earth' && (
                     <div className="relative w-48 h-48 flex items-center justify-center">
-                         <Icons.Mountain size={96} className="text-stone-400 drop-shadow-2xl animate-shake-hard" />
-                         <div className="absolute -bottom-10 w-32 h-16 bg-stone-700 blur-lg animate-pulse"></div>
+                         <Icons.Mountain size={110} className="text-stone-300 drop-shadow-2xl animate-shake-hard" />
+                         <div className="absolute -bottom-10 w-48 h-24 bg-stone-700 blur-xl animate-pulse"></div>
                     </div>
                 )}
 
                 {element === 'Air' && (
                     <div className="relative w-64 h-64 flex items-center justify-center">
-                        <Icons.Wind size={128} className="text-slate-200 opacity-60 blur-[1px] animate-spin-slow" />
-                         <div className="vfx-implode absolute w-full h-full border-2 border-slate-300 rounded-full"></div>
+                        <Icons.Wind size={140} className="text-slate-100 opacity-80 blur-[1px] animate-spin-slow" />
+                         <div className="vfx-implode absolute w-full h-full border-4 border-slate-300 rounded-full opacity-50"></div>
                     </div>
                 )}
 
                 {element === 'Lightning' && (
                     <div className="relative w-full h-full flex items-center justify-center">
-                         <div className="absolute inset-0 bg-white animate-flash opacity-40"></div>
-                         <Icons.Zap size={128} className="text-yellow-200 drop-shadow-[0_0_30px_rgba(253,224,71,1)] animate-shake-hard" />
+                         <div className="absolute inset-0 bg-white animate-flash opacity-60"></div>
+                         <Icons.Zap size={140} className="text-yellow-100 drop-shadow-[0_0_40px_rgba(253,224,71,1)] animate-shake-hard" />
                     </div>
                 )}
 
                 {element === 'Ice' && (
                     <div className="relative w-48 h-48 flex items-center justify-center">
-                        <Icons.Snowflake size={96} className="text-white drop-shadow-[0_0_15px_rgba(186,230,253,1)] animate-shatter" />
+                        <Icons.Snowflake size={110} className="text-white drop-shadow-[0_0_25px_rgba(186,230,253,1)] animate-shatter" />
                     </div>
                 )}
 
                 {element === 'Light' && (
                     <div className="relative w-64 h-[800px] flex items-center justify-center -translate-y-24">
-                        <div className="absolute w-24 h-full bg-gradient-to-t from-yellow-100/10 via-yellow-100/50 to-yellow-100/10 animate-pulse blur-lg"></div>
-                        <Icons.Sun size={128} className="text-yellow-100 absolute top-1/2 -translate-y-1/2 animate-spin-slow z-10 drop-shadow-[0_0_50px_rgba(253,224,71,1)]" />
+                        <div className="absolute w-32 h-full bg-gradient-to-t from-yellow-100/10 via-yellow-100/60 to-yellow-100/10 animate-pulse blur-xl"></div>
+                        <Icons.Sun size={140} className="text-yellow-50 absolute top-1/2 -translate-y-1/2 animate-spin-slow z-10 drop-shadow-[0_0_60px_rgba(253,224,71,1)]" />
                     </div>
                 )}
 
                 {element === 'Dark' && (
                     <div className="relative w-64 h-64 flex items-center justify-center">
-                         <div className="vfx-implode w-48 h-48 bg-black rounded-full border-4 border-purple-900 shadow-[0_0_60px_rgba(147,51,234,0.8)]"></div>
-                         <Icons.Ghost size={64} className="text-purple-900 absolute opacity-50 animate-pulse" />
+                         <div className="vfx-implode w-56 h-56 bg-black rounded-full border-4 border-purple-900 shadow-[0_0_80px_rgba(147,51,234,1)]"></div>
+                         <Icons.Ghost size={80} className="text-purple-300 absolute opacity-70 animate-pulse" />
+                    </div>
+                )}
+                
+                {element === 'Time' && (
+                     <div className="relative w-64 h-64 flex items-center justify-center">
+                         <Icons.Clock size={90} className="text-fuchsia-300 absolute animate-pulse" />
+                         <Icons.RotateCw size={120} className="text-fuchsia-500 absolute animate-spin-slow opacity-50" />
                     </div>
                 )}
 
-                 {(element === 'Nature' || element === 'Metal' || element === 'Blood' || element === 'Time' || element === 'Arcane') && (
+                 {(element === 'Nature' || element === 'Metal' || element === 'Blood' || element === 'Arcane') && (
                      <div className="relative w-48 h-48 flex items-center justify-center">
-                        {/* Generic fallback for special classes but with punchy animation */}
-                        <div className="vfx-implode absolute inset-0 bg-white/20 rounded-full"></div>
-                        <Icons.Sparkles size={80} className="animate-spin text-white drop-shadow-lg" />
+                        <div className="vfx-implode absolute inset-0 bg-white/30 rounded-full blur-md"></div>
+                        <Icons.Sparkles size={90} className="animate-spin text-white drop-shadow-[0_0_20px_currentColor]" style={{ color: ELEMENT_COLORS[element].split(' ')[0].replace('text-', '') }} />
                      </div>
                  )}
             </div>
