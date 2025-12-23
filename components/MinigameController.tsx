@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import * as Icons from 'lucide-react';
 import { MinigameType } from '../types';
@@ -14,37 +15,19 @@ export const MinigameController: React.FC<MinigameControllerProps> = ({ type, on
   return null;
 };
 
-// --- 1. SNOWFLAKE MINIGAME (Ice) ---
-// Click the snowflakes before they disappear!
+// --- 1. SNOWFLAKE BARRAGE (Ice) ---
+// FAST PACED: Click the target to throw snowflakes!
 const SnowflakeMinigame: React.FC<{ onComplete: (m: number) => void }> = ({ onComplete }) => {
-  const [targets, setTargets] = useState<{ id: number; x: number; y: number }[]>([]);
-  const [score, setScore] = useState(0);
+  const [snowballs, setSnowballs] = useState<{ id: number; x: number; y: number; tx: number; ty: number }[]>([]);
+  const [hits, setHits] = useState(0);
   const [timeLeft, setTimeLeft] = useState(3000); // 3 seconds
-  const totalTargets = useRef(5);
-  const spawnedCount = useRef(0);
-
+  
+  // Game Logic
   useEffect(() => {
-    // Spawn targets
-    const interval = setInterval(() => {
-      if (spawnedCount.current >= totalTargets.current) {
-        clearInterval(interval);
-        return;
-      }
-      const id = Date.now();
-      setTargets(prev => [...prev, {
-        id,
-        x: Math.random() * 80 + 10, // 10% to 90%
-        y: Math.random() * 80 + 10
-      }]);
-      spawnedCount.current += 1;
-    }, 400);
-
-    // Timer
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 100) {
           clearInterval(timer);
-          clearInterval(interval);
           finish();
           return 0;
         }
@@ -52,42 +35,83 @@ const SnowflakeMinigame: React.FC<{ onComplete: (m: number) => void }> = ({ onCo
       });
     }, 100);
 
-    return () => {
-      clearInterval(interval);
-      clearInterval(timer);
-    };
+    return () => clearInterval(timer);
   }, []);
 
-  const handleClick = (id: number) => {
-    setTargets(prev => prev.filter(t => t.id !== id));
-    setScore(prev => prev + 1);
+  const handleClick = (e: React.MouseEvent) => {
+    // Spawn a snowball at mouse position moving towards center (50, 50)
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    // Add snowball visual
+    const id = Date.now();
+    setSnowballs(prev => [...prev, { id, x, y, tx: 50, ty: 50 }]);
+    
+    // Count hit
+    setHits(h => h + 1);
+
+    // Remove after animation
+    setTimeout(() => {
+      setSnowballs(prev => prev.filter(s => s.id !== id));
+    }, 400);
   };
 
   const finish = () => {
-    // Score 0-5. Multiplier range: 1.0 to 2.0
-    // 0 hits = 1.0x
-    // 5 hits = 2.0x
-    const multiplier = 1 + (score / totalTargets.current);
+    // Score based on rapid clicks. 15 clicks = max 2.0x multiplier
+    const maxClicks = 15;
+    // Multiplier caps at 2.0x, starts at 1.0x
+    const multiplier = 1 + Math.min(1, hits / maxClicks);
     setTimeout(() => onComplete(multiplier), 500);
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm cursor-crosshair">
-       <div className="absolute top-4 text-white text-2xl font-bold font-mono">
-          CLICK THE FLAKES! {score}/{totalTargets.current}
+    <div 
+      className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm cursor-crosshair overflow-hidden"
+      onClick={handleClick}
+    >
+       <div className="absolute top-4 text-white text-2xl font-bold font-mono z-20 pointer-events-none drop-shadow-md">
+          RAPID FIRE! CLICK TO THROW!
        </div>
-       <div className="w-full h-full relative overflow-hidden">
-          {targets.map(t => (
-             <div 
-                key={t.id}
-                onClick={(e) => { e.stopPropagation(); handleClick(t.id); }}
-                className="absolute text-cyan-200 animate-pulse hover:scale-125 transition-transform cursor-pointer drop-shadow-[0_0_10px_rgba(34,211,238,1)]"
-                style={{ left: `${t.x}%`, top: `${t.y}%` }}
-             >
-                <Icons.Snowflake size={48} />
-             </div>
-          ))}
+       
+       {/* Target Enemy in Center */}
+       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
+           <div className="w-32 h-32 rounded-full border-4 border-red-500/50 bg-red-900/30 animate-pulse flex items-center justify-center">
+               <Icons.Target size={64} className="text-red-400" />
+           </div>
        </div>
+
+       {/* Hits Counter */}
+       <div className="absolute bottom-10 text-cyan-300 text-6xl font-black opacity-50 pointer-events-none">
+           {hits}
+       </div>
+
+       {/* Flying Snowballs */}
+       {snowballs.map(s => (
+          <div 
+            key={s.id}
+            className="absolute text-white pointer-events-none"
+            style={{ 
+                left: `${s.x}%`, 
+                top: `${s.y}%`,
+                transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+                transform: `translate(-50%, -50%)`,
+                // We use a small timeout or effect to trigger the move, but here we can just animate in CSS with keyframes if we wanted complex curves.
+                // For simplicity in React loop, let's just render start position and let CSS 'left/top' transition to center if we updated state.
+                // But updating state for every frame is slow.
+                // Instead, use animation.
+                animation: 'flyToCenter 0.4s forwards'
+            }}
+          >
+             <Icons.Snowflake size={32} />
+          </div>
+       ))}
+       
+       <style>{`
+         @keyframes flyToCenter {
+           to { left: 50%; top: 50%; opacity: 0; transform: scale(0.5); }
+         }
+       `}</style>
     </div>
   );
 };

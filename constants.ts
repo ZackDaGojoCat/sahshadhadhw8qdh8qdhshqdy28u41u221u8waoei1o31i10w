@@ -1,5 +1,4 @@
 
-
 import { Ability, ElementType, CharacterClass, Weapon } from './types';
 
 export const ELEMENT_COLORS: Record<ElementType, string> = {
@@ -17,7 +16,6 @@ export const ELEMENT_COLORS: Record<ElementType, string> = {
   Blood: 'text-red-600 border-red-700 bg-red-950 shadow-red-600/50',
   Time: 'text-fuchsia-300 border-fuchsia-400 bg-fuchsia-950 shadow-fuchsia-400/50',
   Arcane: 'text-pink-400 border-pink-500 bg-pink-950 shadow-pink-500/50',
-  // NEW ELEMENTS
   Gravity: 'text-indigo-400 border-indigo-500 bg-indigo-950 shadow-indigo-500/50',
   Sound: 'text-teal-200 border-teal-300 bg-teal-950 shadow-teal-300/50',
   Venom: 'text-emerald-500 border-emerald-600 bg-emerald-950 shadow-emerald-500/50',
@@ -25,6 +23,9 @@ export const ELEMENT_COLORS: Record<ElementType, string> = {
   Steam: 'text-gray-300 border-gray-400 bg-gray-800 shadow-gray-400/50',
   Spirit: 'text-blue-200 border-blue-200 bg-slate-900 shadow-blue-200/50',
   Cyber: 'text-green-400 border-green-500 bg-black shadow-green-500/50',
+  // NEW ELEMENTS
+  Quantum: 'text-cyan-600 border-cyan-700 bg-slate-950 shadow-cyan-600/50',
+  Dream: 'text-purple-300 border-purple-300 bg-indigo-900 shadow-purple-300/50',
 };
 
 export const ELEMENT_BG_COLORS: Record<ElementType, string> = {
@@ -42,7 +43,6 @@ export const ELEMENT_BG_COLORS: Record<ElementType, string> = {
   Blood: 'bg-red-800',
   Time: 'bg-fuchsia-600',
   Arcane: 'bg-pink-600',
-  // NEW
   Gravity: 'bg-indigo-700',
   Sound: 'bg-teal-600',
   Venom: 'bg-emerald-700',
@@ -50,6 +50,8 @@ export const ELEMENT_BG_COLORS: Record<ElementType, string> = {
   Steam: 'bg-gray-500',
   Spirit: 'bg-blue-300',
   Cyber: 'bg-green-600',
+  Quantum: 'bg-cyan-800',
+  Dream: 'bg-indigo-400',
 };
 
 export const TYPE_ADVANTAGE: Record<ElementType, ElementType> = {
@@ -67,14 +69,16 @@ export const TYPE_ADVANTAGE: Record<ElementType, ElementType> = {
   Arcane: 'Metal',
   Metal: 'Blood',
   Blood: 'Light',
+  Gravity: 'Air',    
+  Sound: 'Crystal',  
+  Venom: 'Nature',   
+  Crystal: 'Light',  
+  Steam: 'Fire',     
+  Spirit: 'Arcane',  
+  Cyber: 'Metal',    
   // NEW RELATIONS
-  Gravity: 'Air',    // Gravity pulls down Air
-  Sound: 'Crystal',  // Sound shatters Crystal
-  Venom: 'Nature',   // Poison kills Nature
-  Crystal: 'Light',  // Crystal refracts Light
-  Steam: 'Fire',     // Steam douses/confuses Fire
-  Spirit: 'Arcane',  // Spirit passes through magic
-  Cyber: 'Metal',    // Hacking Metal
+  Quantum: 'Time', // Quantum mechanics ignores time
+  Dream: 'Spirit', // Dreams influence the soul
 };
 
 export const WEAPONS: Weapon[] = [
@@ -274,6 +278,14 @@ export const ABILITIES: Ability[] = [
   { id: 'laser_grid', name: 'Laser Grid', description: 'Digital destruction.', element: 'Cyber', manaCost: 20, damage: 40, cooldown: 0, unlockLevel: 1, icon: 'Grid' },
   { id: 'system_crash', name: 'BSOD', description: 'Crash their reality.', element: 'Cyber', manaCost: 90, damage: 150, cooldown: 4, unlockLevel: 2, icon: 'MonitorX' },
 
+  // QUANTUM
+  { id: 'entangle', name: 'Entanglement', description: 'Bind damage to the enemy.', element: 'Quantum', manaCost: 25, damage: 45, cooldown: 1, unlockLevel: 1, icon: 'Link' },
+  { id: 'superposition', name: 'Superposition', description: 'Attack from all states.', element: 'Quantum', manaCost: 80, damage: 130, cooldown: 3, unlockLevel: 2, icon: 'Copy' },
+
+  // DREAM
+  { id: 'nightmare', name: 'Nightmare', description: 'Manifest their fears.', element: 'Dream', manaCost: 30, damage: 50, cooldown: 1, unlockLevel: 1, icon: 'Eye' },
+  { id: 'lucid_strike', name: 'Lucid Strike', description: 'Control reality.', element: 'Dream', manaCost: 70, damage: 120, cooldown: 3, unlockLevel: 2, icon: 'Star' },
+
 ];
 
 export const CHARACTER_CLASSES: CharacterClass[] = [
@@ -431,6 +443,30 @@ export const CHARACTER_CLASSES: CharacterClass[] = [
     element: 'Arcane',
     iconName: 'Book',
     startingAbilities: ['magic_missile', 'mystic_orb'],
+    startingWeaponId: 'training_wand',
+    requiredPrestige: 0
+  },
+  {
+    id: 'quantum',
+    name: 'Quantum Jumper',
+    description: 'Manipulates probabilities and atomic states.',
+    baseHp: 100,
+    baseMp: 110,
+    element: 'Quantum',
+    iconName: 'Activity',
+    startingAbilities: ['quick_slash', 'entangle'],
+    startingWeaponId: 'training_wand',
+    requiredPrestige: 0
+  },
+  {
+    id: 'dream',
+    name: 'Dream Weaver',
+    description: 'Summons figments of imagination to fight.',
+    baseHp: 110,
+    baseMp: 90,
+    element: 'Dream',
+    iconName: 'Cloud',
+    startingAbilities: ['strike', 'nightmare'],
     startingWeaponId: 'training_wand',
     requiredPrestige: 0
   },
