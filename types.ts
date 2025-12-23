@@ -1,5 +1,5 @@
 
-export type ElementType = 'Physical' | 'Fire' | 'Water' | 'Earth' | 'Air' | 'Lightning' | 'Ice' | 'Light' | 'Dark' | 'Nature' | 'Metal' | 'Blood' | 'Time' | 'Arcane' | 'Gravity' | 'Sound' | 'Venom' | 'Crystal' | 'Steam' | 'Spirit' | 'Cyber' | 'Quantum' | 'Dream';
+export type ElementType = 'Physical' | 'Fire' | 'Water' | 'Earth' | 'Air' | 'Lightning' | 'Ice' | 'Light' | 'Dark' | 'Nature' | 'Metal' | 'Blood' | 'Time' | 'Arcane' | 'Gravity' | 'Sound' | 'Venom' | 'Crystal' | 'Steam' | 'Spirit' | 'Cyber' | 'Quantum' | 'Dream' | 'Cosmic' | 'Chaos' | 'Sand' | 'Magma' | 'Plague' | 'Illusion';
 
 export type MinigameType = 'snowflake' | 'mash' | 'timing';
 

@@ -1,5 +1,4 @@
 
-
 import { Enemy, ElementType } from '../types';
 
 // --- PROCEDURAL DATA LISTS ---
@@ -64,7 +63,41 @@ const MONSTER_DATA: Record<string, { names: string[], icons: string[] }> = {
     Physical: {
         names: ['Bandit', 'Warrior', 'Wolf', 'Bear', 'Knight', 'Mercenary', 'Rogue', 'Orc', 'Goblin'],
         icons: ['Sword', 'Shield', 'User', 'Axe']
-    }
+    },
+    // NEW ELEMENTS
+    Cosmic: {
+        names: ['Alien', 'Star Spawn', 'Void Walker', 'Nebula Spirit', 'Comet', 'Observer', 'Elder Thing'],
+        icons: ['Star', 'Moon', 'Globe', 'Eye']
+    },
+    Chaos: {
+        names: ['Anomaly', 'Glitch', 'Mutant', 'Horror', 'Shifter', 'Abomination', 'Entropy'],
+        icons: ['Shuffle', 'Dices', 'HelpCircle', 'Zap']
+    },
+    Sand: {
+        names: ['Mummy', 'Scorpion', 'Dune Worm', 'Sandman', 'Sphinx', 'Dust Devil', 'Vulture'],
+        icons: ['Wind', 'Hourglass', 'Mountain', 'Sun']
+    },
+    Magma: {
+        names: ['Lava Golem', 'Fire Giant', 'Magma Cube', 'Volcano Spirit', 'Salamander', 'Obsidian Knight'],
+        icons: ['Flame', 'Mountain', 'Triangle', 'Zap']
+    },
+    Plague: {
+        names: ['Rat King', 'Ooze', 'Fungus', 'Bloater', 'Plague Doctor', 'Swarm', 'Zombie'],
+        icons: ['Biohazard', 'Skull', 'Bug', 'Cloud']
+    },
+    Illusion: {
+        names: ['Doppelganger', 'Mirage', 'Phantom', 'Trickster', 'Mask', 'Reflection', 'Dream Eater'],
+        icons: ['Eye', 'Ghost', 'Copy', 'Sparkles']
+    },
+    Gravity: { names: ['Singularity', 'Heavy', 'Crusher'], icons: ['ArrowDownCircle'] },
+    Sound: { names: ['Banshee', 'Screamer', 'Siren'], icons: ['Volume2'] },
+    Venom: { names: ['Snake', 'Spider', 'Assassin'], icons: ['Syringe'] },
+    Crystal: { names: ['Gem Golem', 'Prism', 'Shard'], icons: ['Diamond'] },
+    Steam: { names: ['Vent', 'Boiler', 'Mist'], icons: ['Cloud'] },
+    Spirit: { names: ['Poltergeist', 'Specter', 'Soul'], icons: ['Ghost'] },
+    Cyber: { names: ['Virus', 'Bot', 'Hacker'], icons: ['MonitorX'] },
+    Quantum: { names: ['Particle', 'Wave', 'State'], icons: ['Activity'] },
+    Dream: { names: ['Nightmare', 'Lucid', 'Sleep'], icons: ['Cloud'] }
 };
 
 const FLAVOR_TEMPLATES = [
@@ -98,17 +131,20 @@ export const generateEnemy = async (playerLevel: number): Promise<Enemy> => {
 
     const adjective = getRandomElement(adjList);
 
-    // 2. Determine Element (Random, weighted slightly towards different types)
+    // 2. Determine Element (Include NEW ELEMENTS in the pool)
     const elements: ElementType[] = [
         'Fire', 'Water', 'Earth', 'Air', 'Lightning', 'Ice', 'Light', 'Dark', 'Physical',
-        'Nature', 'Metal', 'Blood', 'Time', 'Arcane'
+        'Nature', 'Metal', 'Blood', 'Time', 'Arcane', 'Gravity', 'Sound', 'Venom',
+        'Crystal', 'Steam', 'Spirit', 'Cyber', 'Quantum', 'Dream',
+        'Cosmic', 'Chaos', 'Sand', 'Magma', 'Plague', 'Illusion'
     ];
     const element = getRandomElement(elements);
     
     // 3. Pick Monster Name & Icon
+    // Fallback to Physical if explicit data missing (though we covered most)
     const data = MONSTER_DATA[element] || MONSTER_DATA.Physical;
-    const baseName = getRandomElement(data.names);
-    const icon = getRandomElement(data.icons);
+    const baseName = getRandomElement(data.names || ['Monster']);
+    const icon = getRandomElement(data.icons || ['Skull']);
 
     const fullName = `${adjective} ${baseName}`;
 

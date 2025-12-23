@@ -23,9 +23,14 @@ export const ELEMENT_COLORS: Record<ElementType, string> = {
   Steam: 'text-gray-300 border-gray-400 bg-gray-800 shadow-gray-400/50',
   Spirit: 'text-blue-200 border-blue-200 bg-slate-900 shadow-blue-200/50',
   Cyber: 'text-green-400 border-green-500 bg-black shadow-green-500/50',
-  // NEW ELEMENTS
   Quantum: 'text-cyan-600 border-cyan-700 bg-slate-950 shadow-cyan-600/50',
   Dream: 'text-purple-300 border-purple-300 bg-indigo-900 shadow-purple-300/50',
+  Cosmic: 'text-violet-200 border-violet-400 bg-black shadow-violet-500/50',
+  Chaos: 'text-red-300 border-red-400 bg-gray-900 shadow-red-400/50',
+  Sand: 'text-yellow-600 border-yellow-700 bg-stone-800 shadow-yellow-600/50',
+  Magma: 'text-orange-600 border-red-600 bg-red-950 shadow-orange-600/50',
+  Plague: 'text-lime-700 border-lime-800 bg-green-950 shadow-lime-700/50',
+  Illusion: 'text-fuchsia-200 border-fuchsia-300 bg-fuchsia-950 shadow-fuchsia-300/50',
 };
 
 export const ELEMENT_BG_COLORS: Record<ElementType, string> = {
@@ -52,6 +57,12 @@ export const ELEMENT_BG_COLORS: Record<ElementType, string> = {
   Cyber: 'bg-green-600',
   Quantum: 'bg-cyan-800',
   Dream: 'bg-indigo-400',
+  Cosmic: 'bg-violet-900',
+  Chaos: 'bg-gray-800',
+  Sand: 'bg-yellow-700',
+  Magma: 'bg-orange-800',
+  Plague: 'bg-lime-900',
+  Illusion: 'bg-fuchsia-800',
 };
 
 export const TYPE_ADVANTAGE: Record<ElementType, ElementType> = {
@@ -76,9 +87,14 @@ export const TYPE_ADVANTAGE: Record<ElementType, ElementType> = {
   Steam: 'Fire',     
   Spirit: 'Arcane',  
   Cyber: 'Metal',    
-  // NEW RELATIONS
-  Quantum: 'Time', // Quantum mechanics ignores time
-  Dream: 'Spirit', // Dreams influence the soul
+  Quantum: 'Time',
+  Dream: 'Spirit',
+  Cosmic: 'Gravity', 
+  Chaos: 'Cyber',    
+  Sand: 'Water',     
+  Magma: 'Ice',      
+  Plague: 'Blood',   
+  Illusion: 'Light', 
 };
 
 export const WEAPONS: Weapon[] = [
@@ -122,7 +138,7 @@ export const WEAPONS: Weapon[] = [
 ];
 
 export const ABILITIES: Ability[] = [
-  // --- PHYSICAL (7) ---
+  // --- PHYSICAL ---
   { id: 'strike', name: 'Heavy Strike', description: 'A basic physical blow.', element: 'Physical', manaCost: 0, damage: 10, cooldown: 0, unlockLevel: 1, icon: 'Hammer' },
   { id: 'quick_slash', name: 'Quick Slash', description: 'A fast attack, costs no mana.', element: 'Physical', manaCost: 0, damage: 8, cooldown: 0, unlockLevel: 2, icon: 'Sword' },
   { id: 'pommel_bash', name: 'Pommel Bash', description: 'Stun the enemy with a blunt hit.', element: 'Physical', manaCost: 15, damage: 25, cooldown: 2, unlockLevel: 3, icon: 'Circle' },
@@ -131,7 +147,7 @@ export const ABILITIES: Ability[] = [
   { id: 'bladestorm', name: 'Bladestorm', description: 'Spinning attack.', element: 'Physical', manaCost: 50, damage: 85, cooldown: 3, unlockLevel: 6, icon: 'RotateCcw' },
   { id: 'berserk', name: 'Berserk Barrage', description: 'Unleash a flurry of wild attacks.', element: 'Physical', manaCost: 60, damage: 120, cooldown: 5, unlockLevel: 7, icon: 'Swords' },
 
-  // --- FIRE (7) ---
+  // --- FIRE ---
   { id: 'ember', name: 'Ember Bolt', description: 'Launch a small bolt of fire.', element: 'Fire', manaCost: 10, damage: 20, cooldown: 0, unlockLevel: 1, icon: 'Flame' },
   { id: 'flame_burst', name: 'Flame Burst', description: 'An explosion of heat.', element: 'Fire', manaCost: 20, damage: 35, cooldown: 2, unlockLevel: 2, icon: 'Sun' },
   { id: 'combustion', name: 'Combustion', description: 'Ignite the air itself.', element: 'Fire', manaCost: 30, damage: 50, cooldown: 2, unlockLevel: 3, icon: 'Zap' },
@@ -140,7 +156,7 @@ export const ABILITIES: Ability[] = [
   { id: 'supernova', name: 'Supernova', description: 'A blinding explosion.', element: 'Fire', manaCost: 70, damage: 120, cooldown: 4, unlockLevel: 6, icon: 'Sun' },
   { id: 'inferno', name: 'Hellfire', description: 'Engulf the enemy in a firestorm.', element: 'Fire', manaCost: 90, damage: 150, cooldown: 5, unlockLevel: 7, icon: 'Zap' },
 
-  // --- WATER (7) ---
+  // --- WATER ---
   { id: 'bubble', name: 'Water Bubble', description: 'A concentrated burst of water.', element: 'Water', manaCost: 10, damage: 25, cooldown: 0, unlockLevel: 1, icon: 'Droplets' },
   { id: 'heal', name: 'Mend', description: 'Restore health with magic.', element: 'Water', manaCost: 30, heal: 50, damage: 0, cooldown: 3, unlockLevel: 2, icon: 'Heart' },
   { id: 'aqua_jet', name: 'Aqua Jet', description: 'High pressure water stream.', element: 'Water', manaCost: 25, damage: 55, cooldown: 2, unlockLevel: 3, icon: 'Droplets' },
@@ -149,7 +165,7 @@ export const ABILITIES: Ability[] = [
   { id: 'leviathan', name: 'Leviathans Call', description: 'Summon a beast from the deep.', element: 'Water', manaCost: 70, damage: 130, cooldown: 4, unlockLevel: 6, icon: 'Anchor' },
   { id: 'tsunami', name: 'Tsunami', description: 'Drown the enemy in power.', element: 'Water', manaCost: 85, damage: 165, cooldown: 5, unlockLevel: 7, icon: 'CloudRain' },
 
-  // --- EARTH (7) ---
+  // --- EARTH ---
   { id: 'pebble', name: 'Pebble Shot', description: 'Flick a stone at speed.', element: 'Earth', manaCost: 5, damage: 12, cooldown: 0, unlockLevel: 1, icon: 'Circle' },
   { id: 'rock_throw', name: 'Boulder Toss', description: 'Hurl a heavy rock.', element: 'Earth', manaCost: 20, damage: 30, cooldown: 1, unlockLevel: 2, icon: 'Mountain' },
   { id: 'harden', name: 'Stone Skin', description: 'Repair your armor (Heal).', element: 'Earth', manaCost: 40, heal: 80, damage: 0, cooldown: 4, unlockLevel: 3, icon: 'Shield' },
@@ -158,7 +174,7 @@ export const ABILITIES: Ability[] = [
   { id: 'terra_force', name: 'Terra Force', description: 'The weight of the world.', element: 'Earth', manaCost: 70, damage: 115, cooldown: 4, unlockLevel: 6, icon: 'Mountain' },
   { id: 'earthquake', name: 'Earthquake', description: 'Shatter the ground completely.', element: 'Earth', manaCost: 90, damage: 150, cooldown: 5, unlockLevel: 7, icon: 'Mountain' },
 
-  // --- AIR (7) ---
+  // --- AIR ---
   { id: 'gust', name: 'Gust', description: 'A sharp blast of wind.', element: 'Air', manaCost: 10, damage: 18, cooldown: 0, unlockLevel: 1, icon: 'Wind' },
   { id: 'aerial_ace', name: 'Aerial Ace', description: 'Strike from the sky.', element: 'Air', manaCost: 25, damage: 40, cooldown: 1, unlockLevel: 2, icon: 'Feather' },
   { id: 'vacuum', name: 'Vacuum Blade', description: 'Create a vacuum that slices.', element: 'Air', manaCost: 40, damage: 65, cooldown: 2, unlockLevel: 3, icon: 'Sword' },
@@ -167,7 +183,7 @@ export const ABILITIES: Ability[] = [
   { id: 'sky_fall', name: 'Sky Fall', description: 'Drop from the heavens.', element: 'Air', manaCost: 80, damage: 130, cooldown: 4, unlockLevel: 6, icon: 'ArrowDown' },
   { id: 'hurricane', name: 'Hurricane', description: 'The wrath of the skies.', element: 'Air', manaCost: 95, damage: 160, cooldown: 5, unlockLevel: 7, icon: 'Wind' },
 
-  // --- LIGHTNING (7) ---
+  // --- LIGHTNING ---
   { id: 'spark', name: 'Spark', description: 'A small jolt of electricity.', element: 'Lightning', manaCost: 12, damage: 22, cooldown: 0, unlockLevel: 1, icon: 'Zap' },
   { id: 'shock', name: 'Static Shock', description: 'Paralyzing energy.', element: 'Lightning', manaCost: 25, damage: 45, cooldown: 1, unlockLevel: 2, icon: 'Activity' },
   { id: 'overload', name: 'Overload', description: 'Surge of power.', element: 'Lightning', manaCost: 35, damage: 60, cooldown: 2, unlockLevel: 3, icon: 'Zap' },
@@ -176,8 +192,8 @@ export const ABILITIES: Ability[] = [
   { id: 'plasma_cannon', name: 'Plasma Cannon', description: 'Focused beam of electricity.', element: 'Lightning', manaCost: 80, damage: 135, cooldown: 4, unlockLevel: 6, icon: 'Target' },
   { id: 'thor_wrath', name: 'Gods Wrath', description: 'Summon the ultimate storm.', element: 'Lightning', manaCost: 100, damage: 170, cooldown: 5, unlockLevel: 7, icon: 'Hammer' },
 
-  // --- ICE (7) ---
-  { id: 'ice_shard', name: 'Ice Shard', description: 'A sharp splinter of ice.', element: 'Ice', manaCost: 12, damage: 20, cooldown: 0, unlockLevel: 1, icon: 'Snowflake', minigame: 'snowflake' }, // ADDED MINIGAME
+  // --- ICE ---
+  { id: 'ice_shard', name: 'Ice Shard', description: 'A sharp splinter of ice.', element: 'Ice', manaCost: 12, damage: 20, cooldown: 0, unlockLevel: 1, icon: 'Snowflake', minigame: 'snowflake' }, 
   { id: 'frost', name: 'Frostbite', description: 'Chilling cold touch.', element: 'Ice', manaCost: 25, damage: 40, cooldown: 1, unlockLevel: 2, icon: 'ThermometerSnowflake' },
   { id: 'ice_wall', name: 'Glacial Barrier', description: 'Heal wounds with frozen magic.', element: 'Ice', manaCost: 40, heal: 70, damage: 0, cooldown: 4, unlockLevel: 3, icon: 'Shield' },
   { id: 'ice_age', name: 'Ice Age', description: 'Flash freeze the area.', element: 'Ice', manaCost: 50, damage: 80, cooldown: 3, unlockLevel: 4, icon: 'Snowflake' },
@@ -185,7 +201,7 @@ export const ABILITIES: Ability[] = [
   { id: 'permafrost', name: 'Permafrost', description: 'Eternal cold.', element: 'Ice', manaCost: 80, damage: 130, cooldown: 4, unlockLevel: 6, icon: 'Thermometer' },
   { id: 'absolute_zero', name: 'Absolute Zero', description: 'Freeze time itself.', element: 'Ice', manaCost: 95, damage: 160, cooldown: 5, unlockLevel: 7, icon: 'Snowflake' },
 
-  // --- LIGHT (7) ---
+  // --- LIGHT ---
   { id: 'ray_of_light', name: 'Ray of Light', description: 'A focused beam of light.', element: 'Light', manaCost: 12, damage: 20, cooldown: 0, unlockLevel: 1, icon: 'Sun' },
   { id: 'blessing', name: 'Blessing', description: 'Divine healing.', element: 'Light', manaCost: 30, heal: 55, damage: 0, cooldown: 3, unlockLevel: 2, icon: 'Heart' },
   { id: 'holy_shock', name: 'Holy Shock', description: 'Shock the enemy with holy power.', element: 'Light', manaCost: 25, damage: 45, cooldown: 1, unlockLevel: 3, icon: 'Zap' },
@@ -194,7 +210,7 @@ export const ABILITIES: Ability[] = [
   { id: 'sunburst', name: 'Sunburst', description: 'Explosive light energy.', element: 'Light', manaCost: 70, damage: 115, cooldown: 4, unlockLevel: 6, icon: 'Star' },
   { id: 'judgment_day', name: 'Judgment Day', description: 'The final verdict.', element: 'Light', manaCost: 95, damage: 165, cooldown: 5, unlockLevel: 7, icon: 'Scale' },
 
-  // --- DARK (7) ---
+  // --- DARK ---
   { id: 'gloom', name: 'Gloom Bolt', description: 'A bolt of pure darkness.', element: 'Dark', manaCost: 12, damage: 22, cooldown: 0, unlockLevel: 1, icon: 'Moon' },
   { id: 'dark_pulse', name: 'Dark Pulse', description: 'A wave of bad energy.', element: 'Dark', manaCost: 25, damage: 45, cooldown: 1, unlockLevel: 2, icon: 'Activity' },
   { id: 'shadow_mend', name: 'Shadow Mend', description: 'Stitch wounds with shadow.', element: 'Dark', manaCost: 40, heal: 75, damage: 0, cooldown: 4, unlockLevel: 3, icon: 'Heart' },
@@ -203,7 +219,7 @@ export const ABILITIES: Ability[] = [
   { id: 'eclipse', name: 'Eclipse', description: 'Block out the sun.', element: 'Dark', manaCost: 75, damage: 130, cooldown: 4, unlockLevel: 6, icon: 'Moon' },
   { id: 'cataclysm', name: 'Cataclysm', description: 'Unleash total destruction.', element: 'Dark', manaCost: 100, damage: 170, cooldown: 5, unlockLevel: 7, icon: 'Skull' },
 
-  // --- NATURE (7) ---
+  // --- NATURE ---
   { id: 'vine_whip', name: 'Vine Whip', description: 'Strike with thorny vines.', element: 'Nature', manaCost: 12, damage: 18, cooldown: 0, unlockLevel: 1, icon: 'Flower' },
   { id: 'leech_seed', name: 'Leech Seed', description: 'Drain life from the enemy.', element: 'Nature', manaCost: 25, damage: 20, heal: 20, cooldown: 2, unlockLevel: 2, icon: 'Sprout' },
   { id: 'razor_leaf', name: 'Razor Leaf', description: 'Sharp leaves slice the air.', element: 'Nature', manaCost: 35, damage: 50, cooldown: 1, unlockLevel: 3, icon: 'Feather' },
@@ -212,7 +228,7 @@ export const ABILITIES: Ability[] = [
   { id: 'solar_beam', name: 'Solar Beam', description: 'Concentrated solar power.', element: 'Nature', manaCost: 80, damage: 125, cooldown: 4, unlockLevel: 6, icon: 'Zap' },
   { id: 'wrath_of_gaia', name: 'Wrath of Gaia', description: 'The forest strikes back.', element: 'Nature', manaCost: 100, damage: 165, cooldown: 5, unlockLevel: 7, icon: 'Mountain' },
 
-  // --- METAL (7) ---
+  // --- METAL ---
   { id: 'iron_fist', name: 'Iron Fist', description: 'A punch as hard as steel.', element: 'Metal', manaCost: 10, damage: 20, cooldown: 0, unlockLevel: 1, icon: 'HandMetal' },
   { id: 'shrapnel', name: 'Shrapnel', description: 'Explosive metal fragments.', element: 'Metal', manaCost: 20, damage: 35, cooldown: 1, unlockLevel: 2, icon: 'Hexagon' },
   { id: 'steel_barrier', name: 'Steel Barrier', description: 'Repair armor plating.', element: 'Metal', manaCost: 40, heal: 60, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'Shield' },
@@ -221,7 +237,7 @@ export const ABILITIES: Ability[] = [
   { id: 'guillotine', name: 'Guillotine', description: 'A massive falling blade.', element: 'Metal', manaCost: 80, damage: 130, cooldown: 4, unlockLevel: 6, icon: 'Crop' },
   { id: 'titan_smash', name: 'Titan Smash', description: 'Crush with titanic force.', element: 'Metal', manaCost: 100, damage: 170, cooldown: 5, unlockLevel: 7, icon: 'Hammer' },
 
-  // --- BLOOD (7) ---
+  // --- BLOOD ---
   { id: 'claw_rake', name: 'Claw Rake', description: 'Tear flesh.', element: 'Blood', manaCost: 5, damage: 25, cooldown: 0, unlockLevel: 1, icon: 'Scissors' },
   { id: 'transfusion', name: 'Transfusion', description: 'Steal life essence.', element: 'Blood', manaCost: 30, damage: 30, heal: 30, cooldown: 2, unlockLevel: 2, icon: 'Droplets' },
   { id: 'blood_boil', name: 'Blood Boil', description: 'Boil the enemy from within.', element: 'Blood', manaCost: 40, damage: 60, cooldown: 2, unlockLevel: 3, icon: 'Flame' },
@@ -230,7 +246,7 @@ export const ABILITIES: Ability[] = [
   { id: 'crimson_nova', name: 'Crimson Nova', description: 'Explode in a mist of red.', element: 'Blood', manaCost: 80, damage: 135, cooldown: 4, unlockLevel: 6, icon: 'Sun' },
   { id: 'exsanguinate', name: 'Exsanguinate', description: 'Drain every drop.', element: 'Blood', manaCost: 110, damage: 180, cooldown: 5, unlockLevel: 7, icon: 'Droplets' },
 
-  // --- TIME (7) ---
+  // --- TIME ---
   { id: 'tick_tock', name: 'Tick Tock', description: 'Time ticks away HP.', element: 'Time', manaCost: 15, damage: 20, cooldown: 0, unlockLevel: 1, icon: 'Clock' },
   { id: 'rewind', name: 'Rewind', description: 'Reverse damage taken.', element: 'Time', manaCost: 40, heal: 70, damage: 0, cooldown: 3, unlockLevel: 2, icon: 'Undo2' },
   { id: 'accelerate', name: 'Accelerate', description: 'Speed up attacks.', element: 'Time', manaCost: 35, damage: 50, cooldown: 1, unlockLevel: 3, icon: 'FastForward' },
@@ -239,7 +255,7 @@ export const ABILITIES: Ability[] = [
   { id: 'future_strike', name: 'Future Strike', description: 'An attack from tomorrow.', element: 'Time', manaCost: 85, damage: 140, cooldown: 4, unlockLevel: 6, icon: 'ArrowRight' },
   { id: 'time_stop', name: 'Chrono Break', description: 'Shatter the timeline.', element: 'Time', manaCost: 100, damage: 175, cooldown: 5, unlockLevel: 7, icon: 'Watch' },
 
-  // --- ARCANE (7) ---
+  // --- ARCANE ---
   { id: 'magic_missile', name: 'Magic Missile', description: 'A bolt of pure energy.', element: 'Arcane', manaCost: 10, damage: 18, cooldown: 0, unlockLevel: 1, icon: 'Sparkles' },
   { id: 'mystic_orb', name: 'Mystic Orb', description: 'Launch a volatile sphere.', element: 'Arcane', manaCost: 25, damage: 40, cooldown: 1, unlockLevel: 2, icon: 'Circle' },
   { id: 'barrier', name: 'Mana Barrier', description: 'Convert mana to health.', element: 'Arcane', manaCost: 40, heal: 60, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'Shield' },
@@ -248,290 +264,174 @@ export const ABILITIES: Ability[] = [
   { id: 'disintegrate', name: 'Disintegrate', description: 'Dust to dust.', element: 'Arcane', manaCost: 85, damage: 140, cooldown: 4, unlockLevel: 6, icon: 'Wind' },
   { id: 'supernova_arcane', name: 'Cosmic Burst', description: 'The energy of stars.', element: 'Arcane', manaCost: 100, damage: 170, cooldown: 5, unlockLevel: 7, icon: 'Star' },
 
-  // --- NEW ELEMENTS (2 Each) ---
-  
-  // GRAVITY
+  // --- GRAVITY (Expanded) ---
   { id: 'gravity_well', name: 'Gravity Well', description: 'Crush the enemy with weight.', element: 'Gravity', manaCost: 20, damage: 35, cooldown: 0, unlockLevel: 1, icon: 'ArrowDownCircle', minigame: 'mash' },
-  { id: 'black_hole', name: 'Event Horizon', description: 'A tear in space itself.', element: 'Gravity', manaCost: 80, damage: 140, cooldown: 4, unlockLevel: 2, icon: 'Disc' },
+  { id: 'heavy_pulse', name: 'Heavy Pulse', description: 'A wave of gravitational force.', element: 'Gravity', manaCost: 30, damage: 45, cooldown: 1, unlockLevel: 2, icon: 'Activity' },
+  { id: 'orbit_shield', name: 'Orbit Shield', description: 'Debris blocks harm (Heal).', element: 'Gravity', manaCost: 40, heal: 70, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'Shield' },
+  { id: 'crush', name: 'Crush', description: 'Flatten the foe.', element: 'Gravity', manaCost: 55, damage: 80, cooldown: 2, unlockLevel: 4, icon: 'AlignVerticalJustifyCenter' },
+  { id: 'singularity', name: 'Singularity', description: 'A point of infinite density.', element: 'Gravity', manaCost: 70, damage: 110, cooldown: 3, unlockLevel: 5, icon: 'Disc' },
+  { id: 'neutron_star', name: 'Neutron Star', description: 'Massive impact damage.', element: 'Gravity', manaCost: 90, damage: 140, cooldown: 4, unlockLevel: 6, icon: 'Star' },
+  { id: 'black_hole', name: 'Event Horizon', description: 'A tear in space itself.', element: 'Gravity', manaCost: 110, damage: 180, cooldown: 5, unlockLevel: 7, icon: 'Disc' },
 
-  // SOUND
+  // --- SOUND (Expanded) ---
   { id: 'sonic_boom', name: 'Sonic Boom', description: 'A wall of sound.', element: 'Sound', manaCost: 15, damage: 25, cooldown: 0, unlockLevel: 1, icon: 'Volume2', minigame: 'timing' },
-  { id: 'requiem', name: 'Requiem', description: 'The final song.', element: 'Sound', manaCost: 60, damage: 100, cooldown: 3, unlockLevel: 2, icon: 'Music' },
+  { id: 'echo_strike', name: 'Echo Strike', description: 'Hit twice with sound.', element: 'Sound', manaCost: 30, damage: 40, cooldown: 1, unlockLevel: 2, icon: 'Repeat' },
+  { id: 'sound_barrier', name: 'Sound Barrier', description: 'Vibrations repel attacks.', element: 'Sound', manaCost: 45, heal: 65, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'Wifi' },
+  { id: 'screech', name: 'Screech', description: 'Piercing high frequency.', element: 'Sound', manaCost: 50, damage: 75, cooldown: 2, unlockLevel: 4, icon: 'Mic' },
+  { id: 'resonance', name: 'Resonance', description: 'Amplify internal damage.', element: 'Sound', manaCost: 70, damage: 100, cooldown: 3, unlockLevel: 5, icon: 'Radio' },
+  { id: 'bass_drop', name: 'Bass Drop', description: 'Crushing low frequency.', element: 'Sound', manaCost: 85, damage: 135, cooldown: 4, unlockLevel: 6, icon: 'Music' },
+  { id: 'requiem', name: 'Requiem', description: 'The final song.', element: 'Sound', manaCost: 100, damage: 170, cooldown: 5, unlockLevel: 7, icon: 'Music' },
 
-  // VENOM
+  // --- VENOM (Expanded) ---
   { id: 'toxic_shot', name: 'Toxic Shot', description: 'A dart of pure poison.', element: 'Venom', manaCost: 15, damage: 30, cooldown: 0, unlockLevel: 1, icon: 'Syringe' },
-  { id: 'noxious_cloud', name: 'Noxious Cloud', description: 'Choke the battlefield.', element: 'Venom', manaCost: 50, damage: 90, cooldown: 2, unlockLevel: 2, icon: 'CloudFog' },
+  { id: 'poison_sting', name: 'Poison Sting', description: 'Inject deadly venom.', element: 'Venom', manaCost: 30, damage: 45, cooldown: 1, unlockLevel: 2, icon: 'Bug' },
+  { id: 'acid_spit', name: 'Acid Spit', description: 'Melts armor.', element: 'Venom', manaCost: 40, damage: 60, cooldown: 2, unlockLevel: 3, icon: 'Droplets' },
+  { id: 'venom_coat', name: 'Venom Coat', description: 'Defensive toxicity.', element: 'Venom', manaCost: 45, heal: 60, damage: 0, cooldown: 3, unlockLevel: 4, icon: 'Shield' },
+  { id: 'noxious_cloud', name: 'Noxious Cloud', description: 'Choke the battlefield.', element: 'Venom', manaCost: 65, damage: 95, cooldown: 3, unlockLevel: 5, icon: 'CloudFog' },
+  { id: 'viper_strike', name: 'Viper Strike', description: 'Fast and lethal.', element: 'Venom', manaCost: 80, damage: 130, cooldown: 4, unlockLevel: 6, icon: 'Zap' },
+  { id: 'pandemic', name: 'Pandemic', description: 'Unstoppable spread.', element: 'Venom', manaCost: 100, damage: 175, cooldown: 5, unlockLevel: 7, icon: 'Biohazard' },
 
-  // CRYSTAL
+  // --- CRYSTAL (Expanded) ---
   { id: 'prism_beam', name: 'Prism Beam', description: 'Refracted light energy.', element: 'Crystal', manaCost: 20, damage: 35, cooldown: 0, unlockLevel: 1, icon: 'Diamond' },
-  { id: 'shatter', name: 'Shatter', description: 'Explosive glass shards.', element: 'Crystal', manaCost: 60, damage: 110, cooldown: 3, unlockLevel: 2, icon: 'Sparkles' },
+  { id: 'shard_throw', name: 'Shard Throw', description: 'Sharp crystal fragments.', element: 'Crystal', manaCost: 30, damage: 50, cooldown: 1, unlockLevel: 2, icon: 'Hexagon' },
+  { id: 'refraction', name: 'Refraction', description: 'Bend light to heal.', element: 'Crystal', manaCost: 45, heal: 80, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'Sun' },
+  { id: 'crystal_skin', name: 'Crystal Skin', description: 'Hard as diamond.', element: 'Crystal', manaCost: 50, damage: 40, heal: 40, cooldown: 3, unlockLevel: 4, icon: 'Shield' },
+  { id: 'shatter', name: 'Shatter', description: 'Explosive glass shards.', element: 'Crystal', manaCost: 70, damage: 110, cooldown: 3, unlockLevel: 5, icon: 'Sparkles' },
+  { id: 'gem_storm', name: 'Gem Storm', description: 'A rain of precious stones.', element: 'Crystal', manaCost: 90, damage: 140, cooldown: 4, unlockLevel: 6, icon: 'CloudRain' },
+  { id: 'diamond_dust', name: 'Diamond Dust', description: 'Beautiful destruction.', element: 'Crystal', manaCost: 110, damage: 180, cooldown: 5, unlockLevel: 7, icon: 'Stars' },
 
-  // STEAM
+  // --- STEAM (Expanded) ---
   { id: 'scald', name: 'Scald', description: 'Boiling hot steam.', element: 'Steam', manaCost: 15, damage: 30, cooldown: 0, unlockLevel: 1, icon: 'Cloud' },
-  { id: 'pressure_valve', name: 'Pressure Valve', description: 'Release all pressure.', element: 'Steam', manaCost: 70, damage: 130, cooldown: 3, unlockLevel: 2, icon: 'Gauge' },
+  { id: 'steam_jet', name: 'Steam Jet', description: 'High pressure blast.', element: 'Steam', manaCost: 30, damage: 45, cooldown: 1, unlockLevel: 2, icon: 'Wind' },
+  { id: 'mist_cloak', name: 'Mist Cloak', description: 'Hide in the fog.', element: 'Steam', manaCost: 40, heal: 70, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'EyeOff' },
+  { id: 'pressure_blast', name: 'Pressure Blast', description: 'Explosive release.', element: 'Steam', manaCost: 55, damage: 80, cooldown: 2, unlockLevel: 4, icon: 'Gauge' },
+  { id: 'boil', name: 'Boil', description: 'Cook them alive.', element: 'Steam', manaCost: 70, damage: 100, cooldown: 3, unlockLevel: 5, icon: 'Thermometer' },
+  { id: 'geyser', name: 'Geyser', description: 'Erupt from below.', element: 'Steam', manaCost: 85, damage: 135, cooldown: 4, unlockLevel: 6, icon: 'ArrowUp' },
+  { id: 'pressure_valve', name: 'Overpressure', description: 'Release all pressure.', element: 'Steam', manaCost: 100, damage: 170, cooldown: 5, unlockLevel: 7, icon: 'AlertTriangle' },
 
-  // SPIRIT
+  // --- SPIRIT (Expanded) ---
   { id: 'poltergeist', name: 'Poltergeist', description: 'Throw objects with mind.', element: 'Spirit', manaCost: 20, damage: 35, cooldown: 0, unlockLevel: 1, icon: 'Ghost' },
-  { id: 'soul_drain', name: 'Soul Drain', description: 'Absorb their spirit.', element: 'Spirit', manaCost: 60, damage: 50, heal: 50, cooldown: 3, unlockLevel: 2, icon: 'Heart' },
+  { id: 'wisp_fire', name: 'Wisp Fire', description: 'Spectral flames.', element: 'Spirit', manaCost: 35, damage: 50, cooldown: 1, unlockLevel: 2, icon: 'Flame' },
+  { id: 'phase_shift', name: 'Phase Shift', description: 'Step out of reality.', element: 'Spirit', manaCost: 45, heal: 75, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'Eye' },
+  { id: 'haunt', name: 'Haunt', description: 'Terrify the soul.', element: 'Spirit', manaCost: 60, damage: 85, cooldown: 2, unlockLevel: 4, icon: 'Skull' },
+  { id: 'soul_drain', name: 'Soul Drain', description: 'Absorb their spirit.', element: 'Spirit', manaCost: 75, damage: 60, heal: 60, cooldown: 3, unlockLevel: 5, icon: 'Heart' },
+  { id: 'spectral_blast', name: 'Spectral Blast', description: 'Ectoplasmic explosion.', element: 'Spirit', manaCost: 90, damage: 140, cooldown: 4, unlockLevel: 6, icon: 'Zap' },
+  { id: 'possession', name: 'Possession', description: 'Take control.', element: 'Spirit', manaCost: 110, damage: 180, cooldown: 5, unlockLevel: 7, icon: 'UserPlus' },
 
-  // CYBER
+  // --- CYBER (Expanded) ---
   { id: 'laser_grid', name: 'Laser Grid', description: 'Digital destruction.', element: 'Cyber', manaCost: 20, damage: 40, cooldown: 0, unlockLevel: 1, icon: 'Grid' },
-  { id: 'system_crash', name: 'BSOD', description: 'Crash their reality.', element: 'Cyber', manaCost: 90, damage: 150, cooldown: 4, unlockLevel: 2, icon: 'MonitorX' },
+  { id: 'glitch_ray', name: 'Glitch Ray', description: 'Corrupt their data.', element: 'Cyber', manaCost: 35, damage: 55, cooldown: 1, unlockLevel: 2, icon: 'ZapOff' },
+  { id: 'firewall', name: 'Firewall', description: 'Block incoming attacks.', element: 'Cyber', manaCost: 45, heal: 70, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'Shield' },
+  { id: 'download', name: 'Download', description: 'Acquire new power.', element: 'Cyber', manaCost: 60, damage: 85, cooldown: 2, unlockLevel: 4, icon: 'Download' },
+  { id: 'malware', name: 'Malware', description: 'Infect the system.', element: 'Cyber', manaCost: 75, damage: 110, cooldown: 3, unlockLevel: 5, icon: 'Bug' },
+  { id: 'ddos', name: 'DDoS', description: 'Overwhelm target.', element: 'Cyber', manaCost: 90, damage: 145, cooldown: 4, unlockLevel: 6, icon: 'Server' },
+  { id: 'system_crash', name: 'BSOD', description: 'Crash their reality.', element: 'Cyber', manaCost: 110, damage: 190, cooldown: 5, unlockLevel: 7, icon: 'MonitorX' },
 
-  // QUANTUM
+  // --- QUANTUM (Expanded) ---
   { id: 'entangle', name: 'Entanglement', description: 'Bind damage to the enemy.', element: 'Quantum', manaCost: 25, damage: 45, cooldown: 1, unlockLevel: 1, icon: 'Link' },
-  { id: 'superposition', name: 'Superposition', description: 'Attack from all states.', element: 'Quantum', manaCost: 80, damage: 130, cooldown: 3, unlockLevel: 2, icon: 'Copy' },
+  { id: 'probability_bolt', name: 'Probability Bolt', description: 'Might hit hard.', element: 'Quantum', manaCost: 35, damage: 55, cooldown: 1, unlockLevel: 2, icon: 'HelpCircle' },
+  { id: 'uncertainty', name: 'Uncertainty', description: 'Heal or Harm?', element: 'Quantum', manaCost: 45, heal: 50, damage: 50, cooldown: 3, unlockLevel: 3, icon: 'Shuffle' },
+  { id: 'tunneling', name: 'Tunneling', description: 'Bypass defenses.', element: 'Quantum', manaCost: 60, damage: 90, cooldown: 2, unlockLevel: 4, icon: 'ArrowRight' },
+  { id: 'superposition', name: 'Superposition', description: 'Attack from all states.', element: 'Quantum', manaCost: 80, damage: 120, cooldown: 3, unlockLevel: 5, icon: 'Copy' },
+  { id: 'collapse', name: 'Wave Collapse', description: 'Force a reality.', element: 'Quantum', manaCost: 95, damage: 150, cooldown: 4, unlockLevel: 6, icon: 'Minimize2' },
+  { id: 'multiverse_strike', name: 'Multiverse Strike', description: 'Infinite versions of you.', element: 'Quantum', manaCost: 115, damage: 190, cooldown: 5, unlockLevel: 7, icon: 'Layers' },
 
-  // DREAM
+  // --- DREAM (Expanded) ---
   { id: 'nightmare', name: 'Nightmare', description: 'Manifest their fears.', element: 'Dream', manaCost: 30, damage: 50, cooldown: 1, unlockLevel: 1, icon: 'Eye' },
-  { id: 'lucid_strike', name: 'Lucid Strike', description: 'Control reality.', element: 'Dream', manaCost: 70, damage: 120, cooldown: 3, unlockLevel: 2, icon: 'Star' },
+  { id: 'daydream', name: 'Daydream', description: 'Lost in thought.', element: 'Dream', manaCost: 40, damage: 60, cooldown: 1, unlockLevel: 2, icon: 'Cloud' },
+  { id: 'sleep_dust', name: 'Sleep Dust', description: 'Rest and recover.', element: 'Dream', manaCost: 50, heal: 80, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'Sparkles' },
+  { id: 'lucid_shield', name: 'Lucid Shield', description: 'Will it into existence.', element: 'Dream', manaCost: 60, damage: 40, heal: 40, cooldown: 3, unlockLevel: 4, icon: 'Shield' },
+  { id: 'phantasm', name: 'Phantasm', description: 'Illusory damage.', element: 'Dream', manaCost: 75, damage: 115, cooldown: 3, unlockLevel: 5, icon: 'Ghost' },
+  { id: 'lucid_strike', name: 'Lucid Strike', description: 'Control reality.', element: 'Dream', manaCost: 90, damage: 145, cooldown: 4, unlockLevel: 6, icon: 'Star' },
+  { id: 'imagination_break', name: 'Imagination Break', description: 'Shatter the dream.', element: 'Dream', manaCost: 110, damage: 185, cooldown: 5, unlockLevel: 7, icon: 'Zap' },
 
+  // --- COSMIC (Expanded) ---
+  { id: 'star_fall', name: 'Star Fall', description: 'Call down a small star.', element: 'Cosmic', manaCost: 30, damage: 55, cooldown: 1, unlockLevel: 1, icon: 'Star' },
+  { id: 'comet_shard', name: 'Comet Shard', description: 'Icy space rock.', element: 'Cosmic', manaCost: 40, damage: 65, cooldown: 1, unlockLevel: 2, icon: 'Hexagon' },
+  { id: 'nebula_mist', name: 'Nebula Mist', description: 'Cosmic healing gas.', element: 'Cosmic', manaCost: 50, heal: 85, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'Cloud' },
+  { id: 'meteor', name: 'Meteor', description: 'Massive impact.', element: 'Cosmic', manaCost: 65, damage: 95, cooldown: 2, unlockLevel: 4, icon: 'Disc' },
+  { id: 'quasar', name: 'Quasar', description: 'Blinding energy beam.', element: 'Cosmic', manaCost: 80, damage: 125, cooldown: 3, unlockLevel: 5, icon: 'Sun' },
+  { id: 'gamma_ray', name: 'Gamma Ray', description: 'Pure radiation.', element: 'Cosmic', manaCost: 100, damage: 160, cooldown: 4, unlockLevel: 6, icon: 'Zap' },
+  { id: 'black_sun', name: 'Black Sun', description: 'Eclipse the battlefield.', element: 'Cosmic', manaCost: 120, damage: 200, cooldown: 5, unlockLevel: 7, icon: 'Moon' },
+
+  // --- CHAOS (Expanded) ---
+  { id: 'entropy', name: 'Entropy', description: 'Accelerate disorder.', element: 'Chaos', manaCost: 25, damage: 40, cooldown: 0, unlockLevel: 1, icon: 'Shuffle' },
+  { id: 'discord_orb', name: 'Discord Orb', description: 'Unstable magic.', element: 'Chaos', manaCost: 35, damage: 55, cooldown: 1, unlockLevel: 2, icon: 'Circle' },
+  { id: 'random_burst', name: 'Wild Card', description: 'Random damage (10-100).', element: 'Chaos', manaCost: 45, damage: 80, cooldown: 2, unlockLevel: 3, icon: 'Dices' },
+  { id: 'warp_reality', name: 'Warp Reality', description: 'Heal by twisting time.', element: 'Chaos', manaCost: 50, heal: 80, damage: 0, cooldown: 3, unlockLevel: 4, icon: 'RefreshCcw' },
+  { id: 'dice_roll', name: 'Gamble', description: 'High risk, high reward.', element: 'Chaos', manaCost: 65, damage: 120, cooldown: 3, unlockLevel: 5, icon: 'Dices' },
+  { id: 'anarchy', name: 'Anarchy', description: 'Total breakdown.', element: 'Chaos', manaCost: 85, damage: 150, cooldown: 4, unlockLevel: 6, icon: 'AlertTriangle' },
+  { id: 'total_chaos', name: 'Total Chaos', description: 'The end of order.', element: 'Chaos', manaCost: 110, damage: 195, cooldown: 5, unlockLevel: 7, icon: 'ZapOff' },
+
+  // --- SAND (Expanded) ---
+  { id: 'sandstorm', name: 'Sandstorm', description: 'Scouring winds.', element: 'Sand', manaCost: 20, damage: 35, cooldown: 0, unlockLevel: 1, icon: 'Wind' },
+  { id: 'dust_devil', name: 'Dust Devil', description: 'A small tornado of grit.', element: 'Sand', manaCost: 30, damage: 50, cooldown: 1, unlockLevel: 2, icon: 'Tornado' },
+  { id: 'quicksand', name: 'Quicksand', description: 'Sink the enemy.', element: 'Sand', manaCost: 45, damage: 70, cooldown: 2, unlockLevel: 3, icon: 'AlignVerticalJustifyCenter' },
+  { id: 'dune_shield', name: 'Dune Shield', description: 'Sand armor.', element: 'Sand', manaCost: 50, heal: 75, damage: 0, cooldown: 3, unlockLevel: 4, icon: 'Shield' },
+  { id: 'desiccate', name: 'Desiccate', description: 'Drain all moisture.', element: 'Sand', manaCost: 70, damage: 80, heal: 40, cooldown: 3, unlockLevel: 5, icon: 'Droplets' },
+  { id: 'sand_burial', name: 'Sand Burial', description: 'Crush under tons of sand.', element: 'Sand', manaCost: 90, damage: 145, cooldown: 4, unlockLevel: 6, icon: 'ArrowDown' },
+  { id: 'pharaoh_curse', name: 'Pharaohs Curse', description: 'Ancient wrath.', element: 'Sand', manaCost: 110, damage: 180, cooldown: 5, unlockLevel: 7, icon: 'Skull' },
+
+  // --- MAGMA (Expanded) ---
+  { id: 'lava_burst', name: 'Lava Burst', description: 'Spew molten rock.', element: 'Magma', manaCost: 35, damage: 60, cooldown: 1, unlockLevel: 1, icon: 'Flame' },
+  { id: 'magma_ball', name: 'Magma Ball', description: 'A rolling sphere of heat.', element: 'Magma', manaCost: 45, damage: 75, cooldown: 1, unlockLevel: 2, icon: 'Circle' },
+  { id: 'molten_armor', name: 'Molten Armor', description: 'Cauterize wounds.', element: 'Magma', manaCost: 50, heal: 80, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'Shield' },
+  { id: 'scorched_earth', name: 'Scorched Earth', description: 'Burn everything.', element: 'Magma', manaCost: 65, damage: 100, cooldown: 2, unlockLevel: 4, icon: 'Map' },
+  { id: 'eruption', name: 'Eruption', description: 'Volcanic destruction.', element: 'Magma', manaCost: 85, damage: 135, cooldown: 3, unlockLevel: 5, icon: 'Mountain' },
+  { id: 'volcanic_rock', name: 'Pyroclasm', description: 'Ash and fire.', element: 'Magma', manaCost: 100, damage: 165, cooldown: 4, unlockLevel: 6, icon: 'CloudRain' },
+  { id: 'pompeii', name: 'Pompeii', description: 'Bury them in ash.', element: 'Magma', manaCost: 120, damage: 200, cooldown: 5, unlockLevel: 7, icon: 'Flame' },
+
+  // --- PLAGUE (Expanded) ---
+  { id: 'infect', name: 'Infect', description: 'Spread disease.', element: 'Plague', manaCost: 15, damage: 25, cooldown: 0, unlockLevel: 1, icon: 'Biohazard' },
+  { id: 'rot', name: 'Rot', description: 'Decay from within.', element: 'Plague', manaCost: 30, damage: 45, cooldown: 1, unlockLevel: 2, icon: 'Skull' },
+  { id: 'miasma', name: 'Miasma', description: 'Toxic air.', element: 'Plague', manaCost: 40, damage: 60, cooldown: 2, unlockLevel: 3, icon: 'CloudFog' },
+  { id: 'fester', name: 'Fester', description: 'Wounds get worse.', element: 'Plague', manaCost: 50, damage: 80, cooldown: 2, unlockLevel: 4, icon: 'Activity' },
+  { id: 'contagion', name: 'Contagion', description: 'Mass infection.', element: 'Plague', manaCost: 70, damage: 110, cooldown: 3, unlockLevel: 5, icon: 'Users' },
+  { id: 'outbreak', name: 'Outbreak', description: 'Massive viral load.', element: 'Plague', manaCost: 90, damage: 150, cooldown: 4, unlockLevel: 6, icon: 'AlertTriangle' },
+  { id: 'black_death', name: 'Black Death', description: 'The end of life.', element: 'Plague', manaCost: 110, damage: 190, cooldown: 5, unlockLevel: 7, icon: 'Skull' },
+
+  // --- ILLUSION (Expanded) ---
+  { id: 'phantom_strike', name: 'Phantom Strike', description: 'Is it real?', element: 'Illusion', manaCost: 20, damage: 45, cooldown: 1, unlockLevel: 1, icon: 'Ghost' },
+  { id: 'mirage_blade', name: 'Mirage Blade', description: 'A fake sword hurts too.', element: 'Illusion', manaCost: 35, damage: 60, cooldown: 1, unlockLevel: 2, icon: 'Sword' },
+  { id: 'decoy', name: 'Decoy', description: 'Trick them to heal.', element: 'Illusion', manaCost: 45, heal: 75, damage: 0, cooldown: 3, unlockLevel: 3, icon: 'User' },
+  { id: 'mind_trick', name: 'Mind Trick', description: 'Confuse the enemy.', element: 'Illusion', manaCost: 55, damage: 85, cooldown: 2, unlockLevel: 4, icon: 'HelpCircle' },
+  { id: 'hallucination', name: 'Hallucination', description: 'Mind bending damage.', element: 'Illusion', manaCost: 75, damage: 120, cooldown: 3, unlockLevel: 5, icon: 'Eye' },
+  { id: 'false_reality', name: 'False Reality', description: 'Nothing is true.', element: 'Illusion', manaCost: 90, damage: 155, cooldown: 4, unlockLevel: 6, icon: 'Monitor' },
+  { id: 'shattered_mind', name: 'Shattered Mind', description: 'Break their sanity.', element: 'Illusion', manaCost: 110, damage: 190, cooldown: 5, unlockLevel: 7, icon: 'Zap' },
 ];
 
 export const CHARACTER_CLASSES: CharacterClass[] = [
   // --- BASE CLASSES ---
-  {
-    id: 'knight',
-    name: 'Ember Knight',
-    description: 'A warrior who channels fire through their blade.',
-    baseHp: 150,
-    baseMp: 40,
-    element: 'Fire',
-    iconName: 'Shield',
-    startingAbilities: ['strike', 'ember'],
-    startingWeaponId: 'rusty_sword',
-    requiredPrestige: 0
-  },
-  {
-    id: 'mage',
-    name: 'Tide Caller',
-    description: 'A master of water magic.',
-    baseHp: 90,
-    baseMp: 100,
-    element: 'Water',
-    iconName: 'Sparkles',
-    startingAbilities: ['bubble', 'heal'], // Changed to Bubble to give damage start
-    startingWeaponId: 'training_wand',
-    requiredPrestige: 0
-  },
-  {
-    id: 'rogue',
-    name: 'Ronin',
-    description: 'A swift wanderer who strikes like the wind.',
-    baseHp: 110,
-    baseMp: 60,
-    element: 'Air',
-    iconName: 'Feather',
-    startingAbilities: ['quick_slash', 'gust'],
-    startingWeaponId: 'chipped_dagger',
-    requiredPrestige: 0
-  },
-  {
-    id: 'guardian',
-    name: 'Stone Guardian',
-    description: 'Unbreakable defense. High health pool.',
-    baseHp: 180,
-    baseMp: 30,
-    element: 'Earth',
-    iconName: 'Mountain',
-    startingAbilities: ['strike', 'pebble'],
-    startingWeaponId: 'heavy_club',
-    requiredPrestige: 0
-  },
-  {
-    id: 'storm',
-    name: 'Storm Bringer',
-    description: 'High burst damage, low HP glass cannon.',
-    baseHp: 100,
-    baseMp: 80,
-    element: 'Lightning',
-    iconName: 'Zap',
-    startingAbilities: ['quick_slash', 'spark'],
-    startingWeaponId: 'training_wand',
-    requiredPrestige: 0
-  },
-  {
-    id: 'frost',
-    name: 'Frost Warden',
-    description: 'Uses ice to control the battlefield.',
-    baseHp: 130,
-    baseMp: 70,
-    element: 'Ice',
-    iconName: 'Snowflake',
-    startingAbilities: ['strike', 'ice_shard'],
-    startingWeaponId: 'rusty_sword',
-    requiredPrestige: 0
-  },
-  {
-    id: 'paladin',
-    name: 'Paladin',
-    description: 'Holy warrior of the light. Balanced Offense/Defense.',
-    baseHp: 160,
-    baseMp: 60,
-    element: 'Light',
-    iconName: 'Sun',
-    startingAbilities: ['strike', 'ray_of_light'],
-    startingWeaponId: 'heavy_club',
-    requiredPrestige: 0
-  },
-  {
-    id: 'necro',
-    name: 'Necromancer',
-    description: 'Master of dark arts and life draining.',
-    baseHp: 85,
-    baseMp: 110,
-    element: 'Dark',
-    iconName: 'Skull',
-    startingAbilities: ['gloom', 'dark_pulse'],
-    startingWeaponId: 'training_wand',
-    requiredPrestige: 0
-  },
-  {
-    id: 'sylvan',
-    name: 'Sylvan Archer',
-    description: 'Guardian of the forest. High dexterity.',
-    baseHp: 115,
-    baseMp: 70,
-    element: 'Nature',
-    iconName: 'Sprout',
-    startingAbilities: ['quick_slash', 'vine_whip'],
-    startingWeaponId: 'chipped_dagger',
-    requiredPrestige: 0
-  },
-  {
-    id: 'ironclad',
-    name: 'Ironclad',
-    description: 'A walking tank made of steel.',
-    baseHp: 200,
-    baseMp: 20,
-    element: 'Metal',
-    iconName: 'Hammer',
-    startingAbilities: ['strike', 'iron_fist'],
-    startingWeaponId: 'heavy_club',
-    requiredPrestige: 0
-  },
-  {
-    id: 'bloodmage',
-    name: 'Blood Mage',
-    description: 'Sacrifices health for power. Dangerous.',
-    baseHp: 140,
-    baseMp: 90,
-    element: 'Blood',
-    iconName: 'Droplets',
-    startingAbilities: ['claw_rake', 'transfusion'],
-    startingWeaponId: 'chipped_dagger',
-    requiredPrestige: 0
-  },
-  {
-    id: 'chrono',
-    name: 'Time Walker',
-    description: 'Manipulates time to evade and strike.',
-    baseHp: 105,
-    baseMp: 100,
-    element: 'Time',
-    iconName: 'Clock',
-    startingAbilities: ['quick_slash', 'tick_tock'],
-    startingWeaponId: 'training_wand',
-    requiredPrestige: 0
-  },
-  {
-    id: 'arcanist',
-    name: 'Arcanist',
-    description: 'Scholar of pure magic energy.',
-    baseHp: 95,
-    baseMp: 120,
-    element: 'Arcane',
-    iconName: 'Book',
-    startingAbilities: ['magic_missile', 'mystic_orb'],
-    startingWeaponId: 'training_wand',
-    requiredPrestige: 0
-  },
-  {
-    id: 'quantum',
-    name: 'Quantum Jumper',
-    description: 'Manipulates probabilities and atomic states.',
-    baseHp: 100,
-    baseMp: 110,
-    element: 'Quantum',
-    iconName: 'Activity',
-    startingAbilities: ['quick_slash', 'entangle'],
-    startingWeaponId: 'training_wand',
-    requiredPrestige: 0
-  },
-  {
-    id: 'dream',
-    name: 'Dream Weaver',
-    description: 'Summons figments of imagination to fight.',
-    baseHp: 110,
-    baseMp: 90,
-    element: 'Dream',
-    iconName: 'Cloud',
-    startingAbilities: ['strike', 'nightmare'],
-    startingWeaponId: 'training_wand',
-    requiredPrestige: 0
-  },
+  { id: 'knight', name: 'Ember Knight', description: 'A warrior who channels fire through their blade.', baseHp: 150, baseMp: 40, element: 'Fire', iconName: 'Shield', startingAbilities: ['strike', 'ember'], startingWeaponId: 'rusty_sword', requiredPrestige: 0 },
+  { id: 'mage', name: 'Tide Caller', description: 'A master of water magic.', baseHp: 90, baseMp: 100, element: 'Water', iconName: 'Sparkles', startingAbilities: ['bubble', 'heal'], startingWeaponId: 'training_wand', requiredPrestige: 0 },
+  { id: 'rogue', name: 'Ronin', description: 'A swift wanderer who strikes like the wind.', baseHp: 110, baseMp: 60, element: 'Air', iconName: 'Feather', startingAbilities: ['quick_slash', 'gust'], startingWeaponId: 'chipped_dagger', requiredPrestige: 0 },
+  { id: 'guardian', name: 'Stone Guardian', description: 'Unbreakable defense. High health pool.', baseHp: 180, baseMp: 30, element: 'Earth', iconName: 'Mountain', startingAbilities: ['strike', 'pebble'], startingWeaponId: 'heavy_club', requiredPrestige: 0 },
+  { id: 'storm', name: 'Storm Bringer', description: 'High burst damage, low HP glass cannon.', baseHp: 100, baseMp: 80, element: 'Lightning', iconName: 'Zap', startingAbilities: ['quick_slash', 'spark'], startingWeaponId: 'training_wand', requiredPrestige: 0 },
+  { id: 'frost', name: 'Frost Warden', description: 'Uses ice to control the battlefield.', baseHp: 130, baseMp: 70, element: 'Ice', iconName: 'Snowflake', startingAbilities: ['strike', 'ice_shard'], startingWeaponId: 'rusty_sword', requiredPrestige: 0 },
+  { id: 'paladin', name: 'Paladin', description: 'Holy warrior of the light.', baseHp: 160, baseMp: 60, element: 'Light', iconName: 'Sun', startingAbilities: ['strike', 'ray_of_light'], startingWeaponId: 'heavy_club', requiredPrestige: 0 },
+  { id: 'necro', name: 'Necromancer', description: 'Master of dark arts.', baseHp: 85, baseMp: 110, element: 'Dark', iconName: 'Skull', startingAbilities: ['gloom', 'dark_pulse'], startingWeaponId: 'training_wand', requiredPrestige: 0 },
+  { id: 'sylvan', name: 'Sylvan Archer', description: 'Guardian of the forest.', baseHp: 115, baseMp: 70, element: 'Nature', iconName: 'Sprout', startingAbilities: ['quick_slash', 'vine_whip'], startingWeaponId: 'chipped_dagger', requiredPrestige: 0 },
+  { id: 'ironclad', name: 'Ironclad', description: 'A walking tank made of steel.', baseHp: 200, baseMp: 20, element: 'Metal', iconName: 'Hammer', startingAbilities: ['strike', 'iron_fist'], startingWeaponId: 'heavy_club', requiredPrestige: 0 },
+  { id: 'bloodmage', name: 'Blood Mage', description: 'Sacrifices health for power.', baseHp: 140, baseMp: 90, element: 'Blood', iconName: 'Droplets', startingAbilities: ['claw_rake', 'transfusion'], startingWeaponId: 'chipped_dagger', requiredPrestige: 0 },
+  { id: 'chrono', name: 'Time Walker', description: 'Manipulates time to evade.', baseHp: 105, baseMp: 100, element: 'Time', iconName: 'Clock', startingAbilities: ['quick_slash', 'tick_tock'], startingWeaponId: 'training_wand', requiredPrestige: 0 },
+  { id: 'arcanist', name: 'Arcanist', description: 'Scholar of pure magic energy.', baseHp: 95, baseMp: 120, element: 'Arcane', iconName: 'Book', startingAbilities: ['magic_missile', 'mystic_orb'], startingWeaponId: 'training_wand', requiredPrestige: 0 },
+  { id: 'quantum', name: 'Quantum Jumper', description: 'Manipulates probabilities.', baseHp: 100, baseMp: 110, element: 'Quantum', iconName: 'Activity', startingAbilities: ['entangle', 'probability_bolt'], startingWeaponId: 'training_wand', requiredPrestige: 0 },
+  { id: 'dream', name: 'Dream Weaver', description: 'Summons figments of imagination.', baseHp: 110, baseMp: 90, element: 'Dream', iconName: 'Cloud', startingAbilities: ['nightmare', 'daydream'], startingWeaponId: 'training_wand', requiredPrestige: 0 },
+  
+  // NEW CLASSES
+  { id: 'star_child', name: 'Star Child', description: 'Wields the power of the cosmos.', baseHp: 120, baseMp: 100, element: 'Cosmic', iconName: 'Star', startingAbilities: ['star_fall', 'comet_shard'], startingWeaponId: 'training_wand', requiredPrestige: 0 },
+  { id: 'chaos_agent', name: 'Chaos Agent', description: 'Thrives on unpredictability.', baseHp: 115, baseMp: 75, element: 'Chaos', iconName: 'Shuffle', startingAbilities: ['entropy', 'discord_orb'], startingWeaponId: 'chipped_dagger', requiredPrestige: 0 },
+  { id: 'dune_walker', name: 'Dune Walker', description: 'Controls the shifting sands.', baseHp: 140, baseMp: 50, element: 'Sand', iconName: 'Wind', startingAbilities: ['sandstorm', 'dust_devil'], startingWeaponId: 'rusty_sword', requiredPrestige: 0 },
+  { id: 'volcanist', name: 'Volcanist', description: 'Erupts with molten rage.', baseHp: 160, baseMp: 40, element: 'Magma', iconName: 'Flame', startingAbilities: ['lava_burst', 'magma_ball'], startingWeaponId: 'heavy_club', requiredPrestige: 0 },
+  { id: 'plague_doc', name: 'Plague Doctor', description: 'Spreads sickness and decay.', baseHp: 100, baseMp: 90, element: 'Plague', iconName: 'Biohazard', startingAbilities: ['infect', 'rot'], startingWeaponId: 'chipped_dagger', requiredPrestige: 0 },
+  { id: 'mirage', name: 'Mirage', description: 'Master of deception.', baseHp: 90, baseMp: 110, element: 'Illusion', iconName: 'Eye', startingAbilities: ['phantom_strike', 'mirage_blade'], startingWeaponId: 'training_wand', requiredPrestige: 0 },
 
   // --- PRESTIGE GOD CLASSES ---
-  {
-    id: 'celestial',
-    name: 'Celestial Paragon',
-    description: 'An entity of pure light and physical perfection.',
-    baseHp: 300,
-    baseMp: 150,
-    element: 'Light',
-    iconName: 'Sun',
-    startingAbilities: ['radiance', 'sunburst', 'divine_intervention'],
-    startingWeaponId: 'bringer_of_light',
-    requiredPrestige: 1
-  },
-  {
-    id: 'void_lord',
-    name: 'Void Lord',
-    description: 'Consumes existence. Darkness personified.',
-    baseHp: 250,
-    baseMp: 200,
-    element: 'Dark',
-    iconName: 'Ghost',
-    startingAbilities: ['void_ray', 'cataclysm', 'eclipse'],
-    startingWeaponId: 'void_edge',
-    requiredPrestige: 1
-  },
-  {
-    id: 'tempest',
-    name: 'Tempest God',
-    description: 'Commands storms of air and lightning.',
-    baseHp: 200,
-    baseMp: 220,
-    element: 'Lightning',
-    iconName: 'CloudLightning',
-    startingAbilities: ['chain_lightning', 'thor_wrath', 'hurricane'],
-    startingWeaponId: 'mjolnir',
-    requiredPrestige: 1
-  },
-  {
-    id: 'chronomancer',
-    name: 'Grand Chronomancer',
-    description: 'Weaves time to erase enemies from history.',
-    baseHp: 220,
-    baseMp: 250,
-    element: 'Time',
-    iconName: 'Hourglass',
-    startingAbilities: ['time_stop', 'paradox', 'future_strike'],
-    startingWeaponId: 'chronos_scepter',
-    requiredPrestige: 1
-  },
-  {
-    id: 'arcane_monarch',
-    name: 'Arcane Monarch',
-    description: 'The ruler of all magic.',
-    baseHp: 200,
-    baseMp: 300,
-    element: 'Arcane',
-    iconName: 'Crown',
-    startingAbilities: ['supernova_arcane', 'disintegrate', 'aether_ray'],
-    startingWeaponId: 'infinity_blade',
-    requiredPrestige: 1
-  }
+  { id: 'celestial', name: 'Celestial Paragon', description: 'An entity of pure light.', baseHp: 300, baseMp: 150, element: 'Light', iconName: 'Sun', startingAbilities: ['radiance', 'sunburst', 'divine_intervention'], startingWeaponId: 'bringer_of_light', requiredPrestige: 1 },
+  { id: 'void_lord', name: 'Void Lord', description: 'Consumes existence.', baseHp: 250, baseMp: 200, element: 'Dark', iconName: 'Ghost', startingAbilities: ['void_ray', 'cataclysm', 'eclipse'], startingWeaponId: 'void_edge', requiredPrestige: 1 },
+  { id: 'tempest', name: 'Tempest God', description: 'Commands storms.', baseHp: 200, baseMp: 220, element: 'Lightning', iconName: 'CloudLightning', startingAbilities: ['chain_lightning', 'thor_wrath', 'hurricane'], startingWeaponId: 'mjolnir', requiredPrestige: 1 },
+  { id: 'chronomancer', name: 'Grand Chronomancer', description: 'Weaves time.', baseHp: 220, baseMp: 250, element: 'Time', iconName: 'Hourglass', startingAbilities: ['time_stop', 'paradox', 'future_strike'], startingWeaponId: 'chronos_scepter', requiredPrestige: 1 },
+  { id: 'arcane_monarch', name: 'Arcane Monarch', description: 'The ruler of all magic.', baseHp: 200, baseMp: 300, element: 'Arcane', iconName: 'Crown', startingAbilities: ['supernova_arcane', 'disintegrate', 'aether_ray'], startingWeaponId: 'infinity_blade', requiredPrestige: 1 }
 ];
 
 export const BASE_XP_REQ = 50;
