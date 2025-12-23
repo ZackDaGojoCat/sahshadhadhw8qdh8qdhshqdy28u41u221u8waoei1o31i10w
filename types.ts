@@ -1,5 +1,7 @@
 
-export type ElementType = 'Physical' | 'Fire' | 'Water' | 'Earth' | 'Air' | 'Lightning' | 'Ice' | 'Light' | 'Dark' | 'Nature' | 'Metal' | 'Blood' | 'Time' | 'Arcane';
+export type ElementType = 'Physical' | 'Fire' | 'Water' | 'Earth' | 'Air' | 'Lightning' | 'Ice' | 'Light' | 'Dark' | 'Nature' | 'Metal' | 'Blood' | 'Time' | 'Arcane' | 'Gravity' | 'Sound' | 'Venom' | 'Crystal' | 'Steam' | 'Spirit' | 'Cyber';
+
+export type MinigameType = 'snowflake' | 'mash' | 'timing';
 
 export interface Ability {
   id: string;
@@ -13,6 +15,7 @@ export interface Ability {
   unlockLevel: number;
   icon: string; 
   isCustom?: boolean; // Fused abilities
+  minigame?: MinigameType; // NEW: Triggers a minigame for bonus damage
 }
 
 export interface Weapon {

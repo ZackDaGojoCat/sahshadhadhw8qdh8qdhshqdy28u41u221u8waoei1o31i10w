@@ -1,4 +1,5 @@
 
+
 import { Ability, ElementType, CharacterClass, Weapon } from './types';
 
 export const ELEMENT_COLORS: Record<ElementType, string> = {
@@ -16,6 +17,14 @@ export const ELEMENT_COLORS: Record<ElementType, string> = {
   Blood: 'text-red-600 border-red-700 bg-red-950 shadow-red-600/50',
   Time: 'text-fuchsia-300 border-fuchsia-400 bg-fuchsia-950 shadow-fuchsia-400/50',
   Arcane: 'text-pink-400 border-pink-500 bg-pink-950 shadow-pink-500/50',
+  // NEW ELEMENTS
+  Gravity: 'text-indigo-400 border-indigo-500 bg-indigo-950 shadow-indigo-500/50',
+  Sound: 'text-teal-200 border-teal-300 bg-teal-950 shadow-teal-300/50',
+  Venom: 'text-emerald-500 border-emerald-600 bg-emerald-950 shadow-emerald-500/50',
+  Crystal: 'text-rose-300 border-rose-300 bg-rose-950 shadow-rose-300/50',
+  Steam: 'text-gray-300 border-gray-400 bg-gray-800 shadow-gray-400/50',
+  Spirit: 'text-blue-200 border-blue-200 bg-slate-900 shadow-blue-200/50',
+  Cyber: 'text-green-400 border-green-500 bg-black shadow-green-500/50',
 };
 
 export const ELEMENT_BG_COLORS: Record<ElementType, string> = {
@@ -33,6 +42,14 @@ export const ELEMENT_BG_COLORS: Record<ElementType, string> = {
   Blood: 'bg-red-800',
   Time: 'bg-fuchsia-600',
   Arcane: 'bg-pink-600',
+  // NEW
+  Gravity: 'bg-indigo-700',
+  Sound: 'bg-teal-600',
+  Venom: 'bg-emerald-700',
+  Crystal: 'bg-rose-500',
+  Steam: 'bg-gray-500',
+  Spirit: 'bg-blue-300',
+  Cyber: 'bg-green-600',
 };
 
 export const TYPE_ADVANTAGE: Record<ElementType, ElementType> = {
@@ -49,7 +66,15 @@ export const TYPE_ADVANTAGE: Record<ElementType, ElementType> = {
   Time: 'Arcane',
   Arcane: 'Metal',
   Metal: 'Blood',
-  Blood: 'Light'
+  Blood: 'Light',
+  // NEW RELATIONS
+  Gravity: 'Air',    // Gravity pulls down Air
+  Sound: 'Crystal',  // Sound shatters Crystal
+  Venom: 'Nature',   // Poison kills Nature
+  Crystal: 'Light',  // Crystal refracts Light
+  Steam: 'Fire',     // Steam douses/confuses Fire
+  Spirit: 'Arcane',  // Spirit passes through magic
+  Cyber: 'Metal',    // Hacking Metal
 };
 
 export const WEAPONS: Weapon[] = [
@@ -111,7 +136,7 @@ export const ABILITIES: Ability[] = [
   { id: 'supernova', name: 'Supernova', description: 'A blinding explosion.', element: 'Fire', manaCost: 70, damage: 120, cooldown: 4, unlockLevel: 6, icon: 'Sun' },
   { id: 'inferno', name: 'Hellfire', description: 'Engulf the enemy in a firestorm.', element: 'Fire', manaCost: 90, damage: 150, cooldown: 5, unlockLevel: 7, icon: 'Zap' },
 
-  // --- WATER (7) - BUFFED ---
+  // --- WATER (7) ---
   { id: 'bubble', name: 'Water Bubble', description: 'A concentrated burst of water.', element: 'Water', manaCost: 10, damage: 25, cooldown: 0, unlockLevel: 1, icon: 'Droplets' },
   { id: 'heal', name: 'Mend', description: 'Restore health with magic.', element: 'Water', manaCost: 30, heal: 50, damage: 0, cooldown: 3, unlockLevel: 2, icon: 'Heart' },
   { id: 'aqua_jet', name: 'Aqua Jet', description: 'High pressure water stream.', element: 'Water', manaCost: 25, damage: 55, cooldown: 2, unlockLevel: 3, icon: 'Droplets' },
@@ -148,7 +173,7 @@ export const ABILITIES: Ability[] = [
   { id: 'thor_wrath', name: 'Gods Wrath', description: 'Summon the ultimate storm.', element: 'Lightning', manaCost: 100, damage: 170, cooldown: 5, unlockLevel: 7, icon: 'Hammer' },
 
   // --- ICE (7) ---
-  { id: 'ice_shard', name: 'Ice Shard', description: 'A sharp splinter of ice.', element: 'Ice', manaCost: 12, damage: 20, cooldown: 0, unlockLevel: 1, icon: 'Snowflake' },
+  { id: 'ice_shard', name: 'Ice Shard', description: 'A sharp splinter of ice.', element: 'Ice', manaCost: 12, damage: 20, cooldown: 0, unlockLevel: 1, icon: 'Snowflake', minigame: 'snowflake' }, // ADDED MINIGAME
   { id: 'frost', name: 'Frostbite', description: 'Chilling cold touch.', element: 'Ice', manaCost: 25, damage: 40, cooldown: 1, unlockLevel: 2, icon: 'ThermometerSnowflake' },
   { id: 'ice_wall', name: 'Glacial Barrier', description: 'Heal wounds with frozen magic.', element: 'Ice', manaCost: 40, heal: 70, damage: 0, cooldown: 4, unlockLevel: 3, icon: 'Shield' },
   { id: 'ice_age', name: 'Ice Age', description: 'Flash freeze the area.', element: 'Ice', manaCost: 50, damage: 80, cooldown: 3, unlockLevel: 4, icon: 'Snowflake' },
@@ -218,6 +243,37 @@ export const ABILITIES: Ability[] = [
   { id: 'aether_ray', name: 'Aether Ray', description: 'Beam of raw magic.', element: 'Arcane', manaCost: 65, damage: 100, cooldown: 3, unlockLevel: 5, icon: 'Zap' },
   { id: 'disintegrate', name: 'Disintegrate', description: 'Dust to dust.', element: 'Arcane', manaCost: 85, damage: 140, cooldown: 4, unlockLevel: 6, icon: 'Wind' },
   { id: 'supernova_arcane', name: 'Cosmic Burst', description: 'The energy of stars.', element: 'Arcane', manaCost: 100, damage: 170, cooldown: 5, unlockLevel: 7, icon: 'Star' },
+
+  // --- NEW ELEMENTS (2 Each) ---
+  
+  // GRAVITY
+  { id: 'gravity_well', name: 'Gravity Well', description: 'Crush the enemy with weight.', element: 'Gravity', manaCost: 20, damage: 35, cooldown: 0, unlockLevel: 1, icon: 'ArrowDownCircle', minigame: 'mash' },
+  { id: 'black_hole', name: 'Event Horizon', description: 'A tear in space itself.', element: 'Gravity', manaCost: 80, damage: 140, cooldown: 4, unlockLevel: 2, icon: 'Disc' },
+
+  // SOUND
+  { id: 'sonic_boom', name: 'Sonic Boom', description: 'A wall of sound.', element: 'Sound', manaCost: 15, damage: 25, cooldown: 0, unlockLevel: 1, icon: 'Volume2', minigame: 'timing' },
+  { id: 'requiem', name: 'Requiem', description: 'The final song.', element: 'Sound', manaCost: 60, damage: 100, cooldown: 3, unlockLevel: 2, icon: 'Music' },
+
+  // VENOM
+  { id: 'toxic_shot', name: 'Toxic Shot', description: 'A dart of pure poison.', element: 'Venom', manaCost: 15, damage: 30, cooldown: 0, unlockLevel: 1, icon: 'Syringe' },
+  { id: 'noxious_cloud', name: 'Noxious Cloud', description: 'Choke the battlefield.', element: 'Venom', manaCost: 50, damage: 90, cooldown: 2, unlockLevel: 2, icon: 'CloudFog' },
+
+  // CRYSTAL
+  { id: 'prism_beam', name: 'Prism Beam', description: 'Refracted light energy.', element: 'Crystal', manaCost: 20, damage: 35, cooldown: 0, unlockLevel: 1, icon: 'Diamond' },
+  { id: 'shatter', name: 'Shatter', description: 'Explosive glass shards.', element: 'Crystal', manaCost: 60, damage: 110, cooldown: 3, unlockLevel: 2, icon: 'Sparkles' },
+
+  // STEAM
+  { id: 'scald', name: 'Scald', description: 'Boiling hot steam.', element: 'Steam', manaCost: 15, damage: 30, cooldown: 0, unlockLevel: 1, icon: 'Cloud' },
+  { id: 'pressure_valve', name: 'Pressure Valve', description: 'Release all pressure.', element: 'Steam', manaCost: 70, damage: 130, cooldown: 3, unlockLevel: 2, icon: 'Gauge' },
+
+  // SPIRIT
+  { id: 'poltergeist', name: 'Poltergeist', description: 'Throw objects with mind.', element: 'Spirit', manaCost: 20, damage: 35, cooldown: 0, unlockLevel: 1, icon: 'Ghost' },
+  { id: 'soul_drain', name: 'Soul Drain', description: 'Absorb their spirit.', element: 'Spirit', manaCost: 60, damage: 50, heal: 50, cooldown: 3, unlockLevel: 2, icon: 'Heart' },
+
+  // CYBER
+  { id: 'laser_grid', name: 'Laser Grid', description: 'Digital destruction.', element: 'Cyber', manaCost: 20, damage: 40, cooldown: 0, unlockLevel: 1, icon: 'Grid' },
+  { id: 'system_crash', name: 'BSOD', description: 'Crash their reality.', element: 'Cyber', manaCost: 90, damage: 150, cooldown: 4, unlockLevel: 2, icon: 'MonitorX' },
+
 ];
 
 export const CHARACTER_CLASSES: CharacterClass[] = [

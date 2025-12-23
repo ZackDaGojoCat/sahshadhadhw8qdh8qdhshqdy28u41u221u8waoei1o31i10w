@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Player, Enemy, Ability, GameState, CombatLogEntry, DamageNumber, ElementType, VisualEffect, Weapon, P2PMessage 
+  Player, Enemy, Ability, GameState, CombatLogEntry, DamageNumber, ElementType, VisualEffect, Weapon, P2PMessage, MinigameType 
 } from './types';
 import { 
   ABILITIES, TYPE_ADVANTAGE, CHARACTER_CLASSES, BASE_XP_REQ, XP_SCALING, WEAPONS, ELEMENT_COLORS, ELEMENT_BG_COLORS
@@ -10,6 +10,7 @@ import { encodePlayerToCode, decodeCodeToEnemy } from './services/pvpService';
 import { playSfx } from './services/audioService';
 import { BattleScene } from './components/BattleScene';
 import { AbilityCard } from './components/AbilityCard';
+import { MinigameController } from './components/MinigameController'; // NEW IMPORT
 import * as Icons from 'lucide-react';
 // @ts-ignore
 import { Peer } from 'peerjs';
@@ -74,6 +75,9 @@ const App: React.FC = () => {
   const [flashScreen, setFlashScreen] = useState<'red' | 'white' | null>(null);
   const [combatPhase, setCombatPhase] = useState<'idle' | 'player_lunge' | 'player_return' | 'enemy_lunge' | 'enemy_return'>('idle');
   const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
+  
+  // Minigame State
+  const [activeMinigame, setActiveMinigame] = useState<{ type: MinigameType, ability: Ability } | null>(null);
 
   // --- SAVE SYSTEM ---
   useEffect(() => {
@@ -369,6 +373,30 @@ const App: React.FC = () => {
         return;
     }
 
+    // NEW: CHECK FOR MINIGAME BEFORE EXECUTING
+    if (ability.minigame && !isOnline) {
+        setActiveMinigame({ type: ability.minigame, ability: ability });
+        return;
+    }
+
+    executeAbility(ability, 1.0);
+  };
+  
+  const handleMinigameComplete = (multiplier: number) => {
+      const ability = activeMinigame?.ability;
+      setActiveMinigame(null);
+      if (ability) {
+          if (multiplier > 1.0) {
+             addDamageNumber(`${multiplier.toFixed(1)}x`, 50, 20, '#facc15');
+             playSfx('ui');
+          }
+          executeAbility(ability, multiplier);
+      }
+  };
+
+  const executeAbility = (ability: Ability, damageMultiplier: number) => {
+     if (!enemy) return;
+
     setPlayer(p => ({ ...p, currentMp: p.currentMp - ability.manaCost }));
     if (ability.cooldown > 0) {
         setCooldowns(prev => ({ ...prev, [ability.id]: ability.cooldown + 1 })); 
@@ -385,7 +413,8 @@ const App: React.FC = () => {
             abilityId: ability.id // Pass ID
         });
         
-        const healAmount = ability.heal! + (player.level * 8);
+        let healAmount = ability.heal! + (player.level * 8);
+        healAmount = Math.floor(healAmount * damageMultiplier); // Minigame affects heals too? Why not.
         
         if (isOnline && conn) {
             // Send Heal info to opponent
@@ -428,8 +457,11 @@ const App: React.FC = () => {
             abilityId: ability.id 
         });
         
-        const { damage, isCritical } = calculateDamage(player.level, ability.damage || 0, ability.element, enemy.element, player.weapon.damage);
+        let { damage, isCritical } = calculateDamage(player.level, ability.damage || 0, ability.element, enemy.element, player.weapon.damage);
         
+        // APPLY MINIGAME MULTIPLIER
+        damage = Math.floor(damage * damageMultiplier);
+
         setTimeout(() => {
             setActiveEffect({ 
                 id: 'atk-impact', 
@@ -1012,7 +1044,7 @@ const App: React.FC = () => {
                     You will <strong>keep your current abilities</strong>, but future growth will align with your new element.
                  </p>
 
-                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full">
+                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full h-[60vh] overflow-y-auto custom-scrollbar p-2">
                      {Object.keys(ELEMENT_COLORS).filter(e => e !== 'Physical').map((elem) => {
                          const element = elem as ElementType;
                          // @ts-ignore
@@ -1027,7 +1059,7 @@ const App: React.FC = () => {
                                 key={element} 
                                 onClick={() => handleElementChange(element)}
                                 className={`
-                                    relative p-4 rounded-xl border-2 transition-all duration-300 group
+                                    relative p-4 rounded-xl border-2 transition-all duration-300 group min-h-[100px] flex flex-col items-center justify-center
                                     ${isCurrent ? 'border-white bg-slate-800 scale-105 shadow-2xl' : `border-slate-800 bg-slate-900/50 hover:border-slate-500 hover:bg-slate-800`}
                                 `}
                              >
@@ -1227,16 +1259,28 @@ const App: React.FC = () => {
                     </div>
                 ) : (
                     <>
-                    <BattleScene 
-                        player={player} 
-                        enemy={enemy} 
-                        isPlayerTurn={isPlayerTurn} 
-                        damageNumbers={damageNumbers}
-                        activeEffect={activeEffect}
-                        shakeScreen={shakeScreen}
-                        flashScreen={flashScreen}
-                        combatPhase={combatPhase}
-                    />
+                    <div className="relative">
+                        <BattleScene 
+                            player={player} 
+                            enemy={enemy} 
+                            isPlayerTurn={isPlayerTurn} 
+                            damageNumbers={damageNumbers}
+                            activeEffect={activeEffect}
+                            shakeScreen={shakeScreen}
+                            flashScreen={flashScreen}
+                            combatPhase={combatPhase}
+                        />
+
+                        {/* MINIGAME OVERLAY */}
+                        {activeMinigame && (
+                            <div className="absolute inset-0 z-50 rounded-xl overflow-hidden">
+                                <MinigameController 
+                                    type={activeMinigame.type} 
+                                    onComplete={handleMinigameComplete}
+                                />
+                            </div>
+                        )}
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800 backdrop-blur-sm shadow-xl flex flex-col">
@@ -1257,7 +1301,7 @@ const App: React.FC = () => {
                                             ability={ability}
                                             isUnlocked={isUnlocked}
                                             cooldownRemaining={cooldowns[ability.id] || 0}
-                                            disabled={!isPlayerTurn || gameState !== 'COMBAT' || !!activeEffect || combatPhase !== 'idle'}
+                                            disabled={!isPlayerTurn || gameState !== 'COMBAT' || !!activeEffect || combatPhase !== 'idle' || !!activeMinigame}
                                             onClick={() => handlePlayerAbility(ability)}
                                         />
                                     );
