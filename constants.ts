@@ -192,14 +192,14 @@ export const ABILITIES: Ability[] = [
   { id: 'plasma_cannon', name: 'Plasma Cannon', description: 'Focused beam of electricity.', element: 'Lightning', manaCost: 80, damage: 135, cooldown: 4, unlockLevel: 6, icon: 'Target' },
   { id: 'thor_wrath', name: 'Gods Wrath', description: 'Summon the ultimate storm.', element: 'Lightning', manaCost: 100, damage: 170, cooldown: 5, unlockLevel: 7, icon: 'Hammer' },
 
-  // --- ICE ---
-  { id: 'ice_shard', name: 'Ice Shard', description: 'A sharp splinter of ice.', element: 'Ice', manaCost: 12, damage: 20, cooldown: 0, unlockLevel: 1, icon: 'Snowflake', minigame: 'snowflake' }, 
-  { id: 'frost', name: 'Frostbite', description: 'Chilling cold touch.', element: 'Ice', manaCost: 25, damage: 40, cooldown: 1, unlockLevel: 2, icon: 'ThermometerSnowflake' },
-  { id: 'ice_wall', name: 'Glacial Barrier', description: 'Heal wounds with frozen magic.', element: 'Ice', manaCost: 40, heal: 70, damage: 0, cooldown: 4, unlockLevel: 3, icon: 'Shield' },
-  { id: 'ice_age', name: 'Ice Age', description: 'Flash freeze the area.', element: 'Ice', manaCost: 50, damage: 80, cooldown: 3, unlockLevel: 4, icon: 'Snowflake' },
-  { id: 'blizzard', name: 'Blizzard', description: 'A storm of razor hail.', element: 'Ice', manaCost: 65, damage: 100, cooldown: 3, unlockLevel: 5, icon: 'CloudSnow' },
-  { id: 'permafrost', name: 'Permafrost', description: 'Eternal cold.', element: 'Ice', manaCost: 80, damage: 130, cooldown: 4, unlockLevel: 6, icon: 'Thermometer' },
-  { id: 'absolute_zero', name: 'Absolute Zero', description: 'Freeze time itself.', element: 'Ice', manaCost: 95, damage: 160, cooldown: 5, unlockLevel: 7, icon: 'Snowflake' },
+  // --- ICE (BUFFED & LOWER MANA) ---
+  { id: 'ice_shard', name: 'Ice Shard', description: 'A sharp splinter of ice.', element: 'Ice', manaCost: 8, damage: 25, cooldown: 0, unlockLevel: 1, icon: 'Snowflake' }, 
+  { id: 'frost', name: 'Frostbite', description: 'Chilling cold touch.', element: 'Ice', manaCost: 20, damage: 45, cooldown: 1, unlockLevel: 2, icon: 'ThermometerSnowflake' },
+  { id: 'ice_wall', name: 'Glacial Barrier', description: 'Heal wounds with frozen magic.', element: 'Ice', manaCost: 30, heal: 90, damage: 0, cooldown: 4, unlockLevel: 3, icon: 'Shield' },
+  { id: 'ice_age', name: 'Ice Age', description: 'Flash freeze the area.', element: 'Ice', manaCost: 45, damage: 95, cooldown: 3, unlockLevel: 4, icon: 'Snowflake' },
+  { id: 'blizzard', name: 'Blizzard', description: 'A storm of razor hail.', element: 'Ice', manaCost: 60, damage: 110, cooldown: 3, unlockLevel: 5, icon: 'CloudSnow' },
+  { id: 'permafrost', name: 'Permafrost', description: 'Eternal cold.', element: 'Ice', manaCost: 75, damage: 140, cooldown: 4, unlockLevel: 6, icon: 'Thermometer' },
+  { id: 'absolute_zero', name: 'Absolute Zero', description: 'Freeze time itself.', element: 'Ice', manaCost: 90, damage: 175, cooldown: 5, unlockLevel: 7, icon: 'Snowflake' },
 
   // --- LIGHT ---
   { id: 'ray_of_light', name: 'Ray of Light', description: 'A focused beam of light.', element: 'Light', manaCost: 12, damage: 20, cooldown: 0, unlockLevel: 1, icon: 'Sun' },
@@ -354,8 +354,8 @@ export const CHARACTER_CLASSES: CharacterClass[] = [
   { id: 'guardian', name: 'Stone Guardian', description: 'Unbreakable defense. High health pool.', baseHp: 180, baseMp: 30, element: 'Earth', iconName: 'Mountain', startingAbilities: ['strike', 'pebble'], startingWeaponId: 'heavy_club', requiredPrestige: 0 },
   { id: 'storm', name: 'Storm Bringer', description: 'High burst damage, low HP glass cannon.', baseHp: 100, baseMp: 80, element: 'Lightning', iconName: 'Zap', startingAbilities: ['quick_slash', 'spark'], startingWeaponId: 'training_wand', requiredPrestige: 0 },
   
-  // BUFFED FROST WARDEN
-  { id: 'frost', name: 'Frost Warden', description: 'Uses ice to control the battlefield.', baseHp: 155, baseMp: 100, element: 'Ice', iconName: 'Snowflake', startingAbilities: ['strike', 'ice_shard'], startingWeaponId: 'rusty_sword', requiredPrestige: 0 },
+  // BUFFED FROST WARDEN (HP 155->175, MP 100->120)
+  { id: 'frost', name: 'Frost Warden', description: 'Uses ice to control the battlefield.', baseHp: 175, baseMp: 120, element: 'Ice', iconName: 'Snowflake', startingAbilities: ['strike', 'ice_shard'], startingWeaponId: 'rusty_sword', requiredPrestige: 0 },
   
   { id: 'paladin', name: 'Paladin', description: 'Holy warrior of the light.', baseHp: 160, baseMp: 60, element: 'Light', iconName: 'Sun', startingAbilities: ['strike', 'ray_of_light'], startingWeaponId: 'heavy_club', requiredPrestige: 0 },
   { id: 'necro', name: 'Necromancer', description: 'Master of dark arts.', baseHp: 85, baseMp: 110, element: 'Dark', iconName: 'Skull', startingAbilities: ['gloom', 'dark_pulse'], startingWeaponId: 'training_wand', requiredPrestige: 0 },
