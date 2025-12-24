@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Elemental Odyssey</title>
     <script>
-      // Polyfill for PeerJS/Packages relying on 'global'
+      // CRITICAL FIX: Polyfill for PeerJS in Vite/Production
       if (typeof global === 'undefined') {
         window.global = window;
       }
@@ -189,12 +189,12 @@
 {
   "imports": {
     "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react/": "https://esm.sh/react@^19.2.3/",
-    "peerjs": "https://esm.sh/peerjs@^1.5.5",
-    "vite": "https://esm.sh/vite@^7.3.0",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
     "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+    "peerjs": "https://esm.sh/peerjs@^1.5.5",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "vite": "https://esm.sh/vite@^7.3.0"
   }
 }
 </script>
