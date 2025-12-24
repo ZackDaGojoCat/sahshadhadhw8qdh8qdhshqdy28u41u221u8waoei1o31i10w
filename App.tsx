@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Player, Enemy, Ability, GameState, CombatLogEntry, DamageNumber, ElementType, VisualEffect, Weapon, P2PMessage, MinigameType 
@@ -11,30 +10,26 @@ import { encodePlayerToCode, decodeCodeToEnemy } from './services/pvpService';
 import { playSfx } from './services/audioService';
 import { BattleScene } from './components/BattleScene';
 import { AbilityCard } from './components/AbilityCard';
-import { MinigameController } from './components/MinigameController';
+import { MinigameController } from './components/MinigameController'; // NEW IMPORT
 import * as Icons from 'lucide-react';
 // @ts-ignore
-import Peer from 'peerjs';
+import { Peer } from 'peerjs';
 
 const FallbackIcon: React.FC<{ className?: string; size?: number }> = ({ className, size }) => (
   <div className={`w-4 h-4 rounded-full bg-gray-500 ${className ?? ''}`} style={{ width: size, height: size }} />
 );
 
 const getIcon = (name: string): React.ElementType => {
+  // Cast to any to avoid build errors if specific icon names change in library versions
   const icons = Icons as any;
   return icons[name] ?? icons.CircleHelp ?? icons.HelpCircle ?? icons.AlertCircle ?? FallbackIcon;
 };
 
 const DEFAULT_WEAPON = WEAPONS[0];
-const SAVE_KEY = 'EO_SAVE_V6_EVO'; 
+const SAVE_KEY = 'EO_SAVE_V6_EVO'; // Updated save key
 const FUSION_COST = 500;
 
-// COMBAT TIMINGS (ms) - TIGHTENED FOR M1 FEEL
-const TIMING_WINDUP = 100;
-const TIMING_PROJECTILE = 250;
-const TIMING_IMPACT = 300; 
-const TIMING_RETURN = 150;
-
+// Replaced constant with a function to ensure fresh state on reset
 const getInitialPlayer = (): Player => ({
     name: 'Hero',
     maxHp: 0, currentHp: 0,
@@ -51,14 +46,15 @@ const App: React.FC = () => {
   const [enemy, setEnemy] = useState<Enemy | null>(null);
   const [showSaveIndicator, setShowSaveIndicator] = useState(false);
   
+  // Wipe Guard to prevent autosave loop
   const isWiping = useRef(false);
 
-  // PVP State
+  // PVP State (Offline)
   const [pvpCodeInput, setPvpCodeInput] = useState("");
   const [generatedCode, setGeneratedCode] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
 
-  // PVP State (Online)
+  // PVP State (Online/P2P)
   const [peer, setPeer] = useState<any>(null);
   const [myPeerId, setMyPeerId] = useState<string>("");
   const [remotePeerId, setRemotePeerId] = useState<string>("");
@@ -66,11 +62,11 @@ const App: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<string>("Disconnected");
 
-  // Fusion
+  // Fusion State
   const [fusionSlot1, setFusionSlot1] = useState<Ability | null>(null);
   const [fusionSlot2, setFusionSlot2] = useState<Ability | null>(null);
 
-  // Combat
+  // Combat State
   const [combatLog, setCombatLog] = useState<CombatLogEntry[]>([]);
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [damageNumbers, setDamageNumbers] = useState<DamageNumber[]>([]);
@@ -80,7 +76,7 @@ const App: React.FC = () => {
   const [combatPhase, setCombatPhase] = useState<'idle' | 'player_lunge' | 'player_return' | 'enemy_lunge' | 'enemy_return'>('idle');
   const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
   
-  // Minigame
+  // Minigame State
   const [activeMinigame, setActiveMinigame] = useState<{ type: MinigameType, ability: Ability } | null>(null);
 
   // --- SAVE SYSTEM ---
@@ -89,6 +85,7 @@ const App: React.FC = () => {
       if (saved) {
           try {
               const loadedPlayer = JSON.parse(saved);
+              // Migration checks
               if (!loadedPlayer.customAbilities) loadedPlayer.customAbilities = [];
               if (loadedPlayer.lastEvolvedLevel === undefined) loadedPlayer.lastEvolvedLevel = 0;
               setPlayer(loadedPlayer);
@@ -102,14 +99,15 @@ const App: React.FC = () => {
   }, []);
 
   const saveGame = (p: Player) => {
-      if (isWiping.current) return;
+      if (isWiping.current) return; // DO NOT SAVE IF WIPING
       localStorage.setItem(SAVE_KEY, JSON.stringify(p));
   };
 
   useEffect(() => {
-      if (isWiping.current) return;
+      if (isWiping.current) return; // Guard
       if (player.classId && gameState !== 'CHARACTER_SELECT') {
           saveGame(player);
+          // Trigger save indicator
           setShowSaveIndicator(true);
           const timer = setTimeout(() => setShowSaveIndicator(false), 2000);
           return () => clearTimeout(timer);
@@ -118,50 +116,38 @@ const App: React.FC = () => {
 
   // --- WIPE SYSTEM ---
   const handleWipeSave = () => {
-      const confirmed = window.confirm("⚠️ DANGER ZONE ⚠️\n\nWipe save data?");
-      if (confirmed && window.confirm("Really delete everything?")) {
-          isWiping.current = true;
-          localStorage.removeItem(SAVE_KEY);
-          window.location.reload(); 
+      const confirmed = window.confirm("⚠️ DANGER ZONE ⚠️\n\nAre you sure you want to WIPE your save?\n\nThis will delete:\n- Level & XP\n- Gold & Items\n- Prestige & Fused Spells\n\nThis cannot be undone.");
+      if (confirmed) {
+          const doubleCheck = window.confirm("Final check: Delete everything and start over?");
+          if (doubleCheck) {
+              isWiping.current = true; // Engage Guard
+              localStorage.removeItem(SAVE_KEY);
+              // Force reload to ensure memory is completely clean
+              window.location.reload(); 
+          }
       }
   };
 
   // --- ONLINE P2P SYSTEM ---
+  
+  // Initialize Peer
   useEffect(() => {
     if (gameState === 'ONLINE_LOBBY' && !peer) {
-        try {
-            // ROBUST PEER INSTANTIATION
-            // Handle both default export and named export patterns to prevent crashes
-            const PeerClass = (Peer as any).default || Peer;
-            
-            if (!PeerClass) {
-                throw new Error("PeerJS library not loaded correctly.");
-            }
+        const newPeer = new Peer();
+        newPeer.on('open', (id: string) => {
+            setMyPeerId(id);
+            setConnectionStatus("Ready to connect");
+        });
 
-            const newPeer = new PeerClass();
-            
-            newPeer.on('open', (id: string) => {
-                setMyPeerId(id);
-                setConnectionStatus("Ready to connect");
-            });
+        newPeer.on('connection', (connection: any) => {
+            setConn(connection);
+            setupConnection(connection);
+        });
 
-            newPeer.on('connection', (connection: any) => {
-                setConn(connection);
-                setupConnection(connection);
-            });
-
-            newPeer.on('error', (err: any) => {
-                console.error("PeerJS Error:", err);
-                setConnectionStatus("Connection Error");
-            });
-
-            setPeer(newPeer);
-        } catch (error) {
-            console.error("Failed to initialize PeerJS:", error);
-            setConnectionStatus("Failed to load PeerJS (Offline Mode Only)");
-        }
+        setPeer(newPeer);
     }
     
+    // Cleanup on exit
     if (gameState !== 'ONLINE_LOBBY' && gameState !== 'COMBAT' && peer) {
        peer.destroy();
        setPeer(null);
@@ -182,7 +168,11 @@ const App: React.FC = () => {
       connection.on('open', () => {
           setConnectionStatus("Connected!");
           setIsOnline(true);
-          const handshake: P2PMessage = { type: 'HANDSHAKE', payload: { player } };
+          // Send Handshake with my stats
+          const handshake: P2PMessage = {
+              type: 'HANDSHAKE',
+              payload: { player }
+          };
           connection.send(handshake);
       });
 
@@ -201,14 +191,20 @@ const App: React.FC = () => {
   const handleP2PData = (data: P2PMessage) => {
       if (data.type === 'HANDSHAKE') {
           const opponent = data.payload.player;
+          // Convert opponent player to Enemy type for battle engine
           const pvpEnemy: Enemy = {
               name: opponent.name,
-              maxHp: opponent.maxHp, currentHp: opponent.currentHp,
-              maxMp: opponent.maxMp, currentMp: opponent.currentMp,
-              level: opponent.level, element: opponent.element,
+              maxHp: opponent.maxHp,
+              currentHp: opponent.currentHp,
+              maxMp: opponent.maxMp,
+              currentMp: opponent.currentMp,
+              level: opponent.level,
+              element: opponent.element,
               iconName: opponent.iconName,
-              description: `Rival (Prestige ${opponent.prestige})`,
-              xpReward: 0, goldReward: 0, isPvP: true, isBoss: false
+              description: `A rival player (Prestige ${opponent.prestige})`,
+              xpReward: 0, goldReward: 0,
+              isPvP: true,
+              isBoss: false
           };
           setEnemy(pvpEnemy);
           setGameState('COMBAT');
@@ -218,12 +214,14 @@ const App: React.FC = () => {
       if (data.type === 'ATTACK') {
           const { abilityName, damage, heal, isCritical, element } = data.payload;
           
-          logMessage(`${enemy?.name || 'Enemy'} used ${abilityName}!`, 'enemy-action');
+          // Show Enemy Attack Visuals
+          logMessage(`Opponent used ${abilityName}!`, 'enemy-action');
           
           if (heal > 0) {
               setEnemy(e => e ? ({ ...e, currentHp: Math.min(e.maxHp, e.currentHp + heal) }) : null);
               setActiveEffect({ id: `heal-${Date.now()}`, type: 'heal', element: element, source: 'enemy', target: 'enemy' });
           } else {
+              // Apply damage to ME
                setCombatPhase('enemy_lunge');
                setTimeout(() => {
                    setActiveEffect({ id: `atk-${Date.now()}`, type: 'projectile', element: element, source: 'enemy', target: 'player' });
@@ -237,15 +235,16 @@ const App: React.FC = () => {
                        setTimeout(() => {
                            setCombatPhase('idle');
                            setActiveEffect(null);
-                           setIsPlayerTurn(true);
+                           setIsPlayerTurn(true); // MY TURN NOW
                            
                            if (player.currentHp - damage <= 0) {
+                               // I lost
                                setGameState('DEFEAT');
                                if (conn) conn.send({ type: 'VICTORY' });
                            }
-                       }, TIMING_RETURN);
-                   }, TIMING_PROJECTILE);
-               }, TIMING_WINDUP);
+                       }, 500);
+                   }, 400);
+               }, 300);
           }
       }
 
@@ -268,17 +267,17 @@ const App: React.FC = () => {
     setDamageNumbers(prev => [...prev, { id, value, x, y, color }]);
     setTimeout(() => {
       setDamageNumbers(prev => prev.filter(dn => dn.id !== id));
-    }, 800);
+    }, 1000);
   };
 
   const triggerShake = () => {
       setShakeScreen(true);
-      setTimeout(() => setShakeScreen(false), 300); 
+      setTimeout(() => setShakeScreen(false), 400); 
   };
 
   const triggerFlash = (color: 'red' | 'white') => {
       setFlashScreen(color);
-      setTimeout(() => setFlashScreen(null), 150); // Faster flash
+      setTimeout(() => setFlashScreen(null), 300);
   };
 
   const selectCharacter = (classId: string) => {
@@ -287,19 +286,22 @@ const App: React.FC = () => {
       if (!charClass) return;
 
       const startingWeapon = WEAPONS.find(w => w.id === charClass.startingWeaponId) || DEFAULT_WEAPON;
+      
       const prestigeMult = 1 + (player.prestige * 0.2); 
 
       const newPlayer: Player = {
           ...player,
-          name: player.name || 'Hero',
+          name: player.name || 'Hero', // Default name if empty
           maxHp: Math.floor(charClass.baseHp * prestigeMult),
           currentHp: Math.floor(charClass.baseHp * prestigeMult),
           maxMp: Math.floor(charClass.baseMp * prestigeMult),
           currentMp: Math.floor(charClass.baseMp * prestigeMult),
-          level: 1, xp: 0, maxXp: BASE_XP_REQ,
+          level: 1,
+          xp: 0,
+          maxXp: BASE_XP_REQ,
           element: charClass.element,
           unlockedAbilities: charClass.startingAbilities,
-          customAbilities: player.customAbilities || [],
+          customAbilities: player.customAbilities || [], // Persist fused abilities unless wiped
           iconName: charClass.iconName,
           classId: charClass.id,
           weapon: startingWeapon,
@@ -318,7 +320,7 @@ const App: React.FC = () => {
     setEnemy(null);
     setCombatPhase('idle');
     setCooldowns({}); 
-    setIsOnline(false); 
+    setIsOnline(false); // Reset online flag for local combat
     
     const difficultyMod = Math.floor(player.winStreak / 3);
     const level = player.level + difficultyMod;
@@ -342,6 +344,7 @@ const App: React.FC = () => {
   const calculateDamage = (attackerLevel: number, baseDamage: number, attackerElement: ElementType, defenderElement: ElementType, weaponDamage: number = 0) => {
     let multiplier = 1;
     let isCritical = false;
+    
     const totalBase = baseDamage + weaponDamage;
     const rawDamage = totalBase + (attackerLevel * 2);
 
@@ -370,6 +373,7 @@ const App: React.FC = () => {
         return;
     }
 
+    // NEW: CHECK FOR MINIGAME BEFORE EXECUTING
     if (ability.minigame && !isOnline) {
         setActiveMinigame({ type: ability.minigame, ability: ability });
         return;
@@ -398,20 +402,34 @@ const App: React.FC = () => {
         setCooldowns(prev => ({ ...prev, [ability.id]: ability.cooldown + 1 })); 
     }
 
+    // HEAL LOGIC
     if (ability.heal) {
         setActiveEffect({ 
-            id: 'heal', type: 'heal', element: ability.element, 
-            source: 'player', target: 'player', abilityId: ability.id 
+            id: 'heal', 
+            type: 'heal', 
+            element: ability.element, 
+            source: 'player', 
+            target: 'player',
+            abilityId: ability.id // Pass ID
         });
         
-        let healAmount = Math.floor((ability.heal! + (player.level * 8)) * damageMultiplier);
+        let healAmount = ability.heal! + (player.level * 8);
+        healAmount = Math.floor(healAmount * damageMultiplier); // Minigame affects heals too? Why not.
         
         if (isOnline && conn) {
-            conn.send({
+            // Send Heal info to opponent
+            const attackData: P2PMessage = {
                 type: 'ATTACK',
-                payload: { abilityName: ability.name, damage: 0, heal: healAmount, isCritical: false, element: ability.element }
-            });
-            setIsPlayerTurn(false); 
+                payload: {
+                    abilityName: ability.name,
+                    damage: 0,
+                    heal: healAmount,
+                    isCritical: false,
+                    element: ability.element
+                }
+            };
+            conn.send(attackData);
+            setIsPlayerTurn(false); // End turn in online
         }
 
         setTimeout(() => {
@@ -419,82 +437,106 @@ const App: React.FC = () => {
             addDamageNumber(`+${healAmount}`, 25, 50, '#4ade80');
             logMessage(`You healed for ${healAmount} HP.`, 'player-action');
             setActiveEffect(null);
-            if (!isOnline) endPlayerTurn();
-        }, 500); // Fast heal
+            
+            if (!isOnline) endPlayerTurn(); // Local turn end
+        }, 800);
         return;
     }
 
-    // --- SNAPPIER ATTACK SEQUENCE ---
+    // ATTACK LOGIC
     setCombatPhase('player_lunge');
 
-    // 1. Lunge (Fast)
     setTimeout(() => {
+        // PASS ABILITY ID HERE FOR UNIQUE VFX
         setActiveEffect({ 
-            id: 'atk-proj', type: 'projectile', element: ability.element, 
-            source: 'player', target: 'enemy', abilityId: ability.id 
+            id: 'atk-proj', 
+            type: 'projectile', 
+            element: ability.element, 
+            source: 'player', 
+            target: 'enemy',
+            abilityId: ability.id 
         });
         
         let { damage, isCritical } = calculateDamage(player.level, ability.damage || 0, ability.element, enemy.element, player.weapon.damage);
+        
+        // APPLY MINIGAME MULTIPLIER
         damage = Math.floor(damage * damageMultiplier);
 
-        // 2. Projectile Travel (Fast)
         setTimeout(() => {
             setActiveEffect({ 
-                id: 'atk-impact', type: 'impact', element: ability.element, 
-                source: 'player', target: 'enemy', abilityId: ability.id 
+                id: 'atk-impact', 
+                type: 'impact', 
+                element: ability.element, 
+                source: 'player', 
+                target: 'enemy',
+                abilityId: ability.id 
             });
             
-            // IMPACT MOMENT
+            // Apply damage locally to enemy visual
             setEnemy(e => e ? { ...e, currentHp: Math.max(0, e.currentHp - damage) } : null);
             addDamageNumber(damage, 75, 50, isCritical ? '#facc15' : '#fff');
             
             triggerShake();
-            if (isCritical) triggerFlash('white');
             setCombatPhase('player_return'); 
 
             generateCombatFlavor(ability.name, "Player", enemy.name, damage, isCritical).then(flavor => {
                 if (flavor) logMessage(flavor, 'player-action');
-                else logMessage(`You hit for ${damage} damage!`, 'player-action');
+                else logMessage(`You hit for ${damage} damage using ${player.weapon.name}!`, 'player-action');
             });
 
+            // ONLINE SEND
             if (isOnline && conn) {
-                conn.send({
+                const attackData: P2PMessage = {
                     type: 'ATTACK',
-                    payload: { abilityName: ability.name, damage, heal: 0, isCritical, element: ability.element }
-                });
+                    payload: {
+                        abilityName: ability.name,
+                        damage: damage,
+                        heal: 0,
+                        isCritical: isCritical,
+                        element: ability.element
+                    }
+                };
+                conn.send(attackData);
+                // In online, we don't automatically trigger 'enemyTurn'. We wait for data.
             }
 
-            // 3. Post-Hit Linger
             setTimeout(() => {
                 setActiveEffect(null);
                 setCombatPhase('idle');
                 
                 if (isOnline) {
-                     setIsPlayerTurn(false);
-                     if (enemy.currentHp - damage <= 0) handleVictory();
+                     setIsPlayerTurn(false); // Pass turn
+                     if (enemy.currentHp - damage <= 0) {
+                         // Win handling
+                         handleVictory();
+                     }
                 } else {
-                    if (enemy.currentHp - damage <= 0) handleVictory();
-                    else endPlayerTurn();
+                    if (enemy.currentHp - damage <= 0) {
+                        handleVictory();
+                    } else {
+                        endPlayerTurn();
+                    }
                 }
-            }, TIMING_IMPACT); 
-        }, TIMING_PROJECTILE); 
-    }, TIMING_WINDUP); 
+            }, 500); 
+        }, 400); 
+    }, 300); 
   };
 
   const endPlayerTurn = () => {
     setIsPlayerTurn(false);
-    setTimeout(enemyTurn, 600); // Less wait for enemy
+    setTimeout(enemyTurn, 1000);
   };
 
   const enemyTurn = () => {
-    if (!enemy || gameState !== 'COMBAT' || isOnline) return; 
+    if (!enemy || gameState !== 'COMBAT' || isOnline) return; // Disable local AI if online
     
+    // Enemy Attack Logic
     setCombatPhase('enemy_lunge');
 
     setTimeout(() => {
         setActiveEffect({ id: 'enemy-proj', type: 'projectile', element: enemy.element, source: 'enemy', target: 'player' });
 
-        const baseEnemyDmg = 10 + (enemy.level * 2.5);
+        const baseEnemyDmg = 10 + (enemy.level * 2.5); // Slightly harder
         const { damage, isCritical } = calculateDamage(enemy.level, baseEnemyDmg, enemy.element, player.element);
 
         setTimeout(() => {
@@ -514,12 +556,13 @@ const App: React.FC = () => {
                     setGameState('DEFEAT');
                     playSfx('defeat');
                 } else {
+                    // Mana regen
                     setPlayer(p => ({ ...p, currentMp: Math.min(p.maxMp, p.currentMp + 5) }));
                     startPlayerTurn();
                 }
-            }, TIMING_IMPACT);
-        }, TIMING_PROJECTILE);
-    }, TIMING_WINDUP);
+            }, 500);
+        }, 400);
+    }, 300);
   };
 
   const startPlayerTurn = () => {
@@ -538,15 +581,17 @@ const App: React.FC = () => {
     playSfx('victory');
     setGameState('VICTORY');
     
+    // Minimal rewards for PvP to prevent abuse
     const xpGain = isOnline ? 0 : enemy.xpReward;
     const goldGain = isOnline ? 0 : enemy.goldReward;
     
     if (isOnline) {
-        logMessage("PvP Victory!", 'system');
+        logMessage("PvP Victory! Glory is its own reward.", 'system');
     } else {
         setPlayer(p => ({ ...p, gold: p.gold + goldGain, winStreak: p.winStreak + 1 }));
         logMessage(`Victory! Gained ${xpGain} XP and ${goldGain} Gold.`, 'system');
         
+        // Boss Drops
         if (enemy.isBoss) {
              const betterWeapons = WEAPONS.filter(w => w.damage > player.weapon.damage || w.rarity !== 'common');
              if (betterWeapons.length > 0) {
@@ -570,16 +615,20 @@ const App: React.FC = () => {
     
         if (leveledUp) {
              const prestigeMult = 1 + (player.prestige * 0.2);
+             
              setPlayer(p => {
+                 // ACCUMULATE ABILITIES: Keep old ones, add new ones if level matches
                  const newAbilities = ABILITIES.filter(a => 
                     (a.element === p.element || a.element === 'Physical') && a.unlockLevel <= newLevel
                  ).map(a => a.id);
+                 
                  const combinedAbilities = Array.from(new Set([...p.unlockedAbilities, ...newAbilities]));
+    
                  return {
                     ...p,
                     level: newLevel,
                     maxHp: Math.floor(p.maxHp + (30 * prestigeMult)),
-                    currentHp: Math.floor(p.maxHp + (30 * prestigeMult)),
+                    currentHp: Math.floor(p.maxHp + (30 * prestigeMult)), // Full heal on level up
                     maxMp: Math.floor(p.maxMp + (15 * prestigeMult)),
                     currentMp: Math.floor(p.maxMp + (15 * prestigeMult)),
                     xp: newXp,
@@ -596,25 +645,30 @@ const App: React.FC = () => {
 
   const handleElementChange = (newElement: ElementType) => {
       playSfx('revive');
+      
+      // Find the "Level 1" ability for this new element so the player has something to use
       const starterAbility = ABILITIES.find(a => a.element === newElement && a.unlockLevel === 1);
+      
       setPlayer(p => {
           const newAbilities = [...p.unlockedAbilities];
           if (starterAbility && !newAbilities.includes(starterAbility.id)) {
               newAbilities.push(starterAbility.id);
           }
+          
           return {
               ...p,
               element: newElement,
               unlockedAbilities: newAbilities,
-              currentHp: p.maxHp, currentMp: p.maxMp,
-              lastEvolvedLevel: p.level
+              currentHp: p.maxHp, // Full heal as bonus
+              currentMp: p.maxMp,
+              lastEvolvedLevel: p.level // Update milestone so we aren't asked again
           };
       });
       setGameState('TOWN');
   };
 
   const handleKeepElement = () => {
-    setPlayer(p => ({ ...p, lastEvolvedLevel: p.level })); 
+    setPlayer(p => ({ ...p, lastEvolvedLevel: p.level })); // Mark this milestone as handled
     setGameState('TOWN');
   };
 
@@ -653,9 +707,15 @@ const App: React.FC = () => {
           return;
       }
       if (!confirm("Are you sure? This will reset your Level to 1, but you will keep your Gold and gain a PERMANENT STAT BOOST.")) return;
+      
       playSfx('revive');
       setPlayer(p => ({
-          ...p, level: 1, prestige: p.prestige + 1, xp: 0, maxXp: BASE_XP_REQ, lastEvolvedLevel: 0
+          ...p,
+          level: 1,
+          prestige: p.prestige + 1,
+          xp: 0,
+          maxXp: BASE_XP_REQ,
+          lastEvolvedLevel: 0
       }));
       setGameState('CHARACTER_SELECT');
   };
@@ -666,28 +726,33 @@ const App: React.FC = () => {
           alert("Not enough Gold!");
           return;
       }
-      playSfx('revive'); 
+      
+      playSfx('revive'); // Sound like an upgrade
+      
+      // 1. Calculate New Stats
       const combinedDmg = (fusionSlot1.damage || 0) + (fusionSlot2.damage || 0);
       const combinedHeal = (fusionSlot1.heal || 0) + (fusionSlot2.heal || 0);
       const combinedMana = Math.floor((fusionSlot1.manaCost + fusionSlot2.manaCost) * 0.9);
       const cooldown = Math.max(fusionSlot1.cooldown, fusionSlot2.cooldown);
       
-      const prefix = fusionSlot1.name.split(" ")[0]; 
-      const suffix = fusionSlot2.name.split(" ").pop(); 
+      // 2. Determine Name
+      const prefix = fusionSlot1.name.split(" ")[0]; // First word of first
+      const suffix = fusionSlot2.name.split(" ").pop(); // Last word of second
       let newName = `${prefix} ${suffix}`;
       if (prefix === suffix) newName = `Double ${prefix}`;
       
+      // 3. Create Ability Object
       const newAbility: Ability = {
           id: `custom_${Date.now()}`,
           name: newName,
           description: `Fused power of ${fusionSlot1.name} and ${fusionSlot2.name}.`,
-          element: fusionSlot1.element, 
+          element: fusionSlot1.element, // Inherit from primary
           manaCost: combinedMana,
-          damage: Math.floor(combinedDmg * 1.1), 
+          damage: Math.floor(combinedDmg * 1.1), // 10% Bonus
           heal: Math.floor(combinedHeal * 1.1),
           cooldown: cooldown,
-          unlockLevel: 1, 
-          icon: fusionSlot1.icon,
+          unlockLevel: 1, // Always available once fused
+          icon: fusionSlot1.icon, // Inherit Icon
           isCustom: true
       };
       
@@ -706,8 +771,10 @@ const App: React.FC = () => {
   const respawn = () => {
       setPlayer(p => ({
           ...p,
-          currentHp: p.maxHp, currentMp: p.maxMp,
-          gold: Math.floor(p.gold * 0.75), winStreak: 0
+          currentHp: p.maxHp,
+          currentMp: p.maxMp,
+          gold: Math.floor(p.gold * 0.75), // Penalty
+          winStreak: 0
       }));
       setEnemy(null);
       setCombatLog([]);
@@ -721,6 +788,7 @@ const App: React.FC = () => {
       setTimeout(() => setCopySuccess(false), 2000);
   };
   
+  // PVP functions
   const openPvPMenu = () => {
     const code = encodePlayerToCode(player);
     setGeneratedCode(code);
@@ -748,14 +816,22 @@ const App: React.FC = () => {
       setTimeout(() => setCopySuccess(false), 2000);
   }
   
+  // Helper to get ALL relevant abilities (Locked AND Unlocked)
   const getAllRelevantAbilities = () => {
+      // 1. Get all base abilities that match the player's current element, physical, OR are already unlocked (from previous classes)
       const relevantBaseAbilities = ABILITIES.filter(a => 
           a.element === 'Physical' || 
           a.element === player.element ||
           player.unlockedAbilities.includes(a.id)
       );
+
+      // 2. Combine with custom abilities
       const allAbilities = [...relevantBaseAbilities, ...player.customAbilities];
+
+      // 3. Remove duplicates (in case a custom ability somehow clashes, though unlikely due to ID gen)
+      //    and Sort by Unlock Level then Name
       const uniqueAbilities = Array.from(new Map(allAbilities.map(a => [a.id, a])).values());
+      
       return uniqueAbilities.sort((a, b) => {
           if (a.unlockLevel !== b.unlockLevel) return a.unlockLevel - b.unlockLevel;
           return a.name.localeCompare(b.name);
@@ -796,6 +872,8 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 w-full max-w-4xl p-4 flex flex-col gap-6 relative">
+        
+        {/* CHARACTER SELECT */}
         {gameState === 'CHARACTER_SELECT' && (
             <div className="flex-1 flex flex-col items-center justify-center">
                 <h2 className="text-3xl font-bold fantasy-font mb-2 text-center text-white">Choose Your Destiny</h2>
@@ -817,6 +895,7 @@ const App: React.FC = () => {
                         const glowColor = (ELEMENT_COLORS[cls.element] || "").split(' ')[3];
                         // @ts-ignore
                         const textColor = (ELEMENT_COLORS[cls.element] || "").split(' ')[0];
+                        
                         const isLocked = cls.requiredPrestige > player.prestige;
                         const isGodly = cls.requiredPrestige > 0;
 
@@ -851,6 +930,7 @@ const App: React.FC = () => {
             </div>
         )}
 
+        {/* TOWN HUB */}
         {gameState === 'TOWN' && (
              <div className="flex-1 flex flex-col items-center justify-center animate-fade-in gap-6">
                  <div className="text-center relative">
@@ -858,6 +938,7 @@ const App: React.FC = () => {
                     
                     <div className="flex flex-col items-center gap-1">
                         <p className="text-slate-400">Current Level <span className="text-blue-400 font-bold text-xl">{player.level}</span></p>
+                        {/* XP BAR */}
                         <div className="w-48 h-2 bg-slate-800 rounded-full border border-slate-700 overflow-hidden relative group">
                              <div className="h-full bg-blue-500 transition-all duration-500" style={{ width: `${Math.min(100, (player.xp / player.maxXp) * 100)}%` }}></div>
                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50">
@@ -910,6 +991,7 @@ const App: React.FC = () => {
                          </div>
                      </button>
 
+                     {/* FUSION BUTTON */}
                      <button onClick={() => setGameState('FUSION')} className="p-6 bg-slate-900 border border-slate-700 rounded-xl flex items-center gap-4 hover:border-pink-500/50 transition-colors col-span-1 md:col-span-2">
                          <div className="p-2 bg-pink-900/20 rounded-lg text-pink-400"><Icons.Atom /></div>
                          <div className="text-left flex-1">
@@ -939,10 +1021,12 @@ const App: React.FC = () => {
                          <div className="text-blue-500 font-bold flex gap-2 items-center text-sm"><Icons.Swords size={16}/> ENTER OFFLINE ARENA</div>
                      </button>
 
+                    {/* REAL TIME PVP BUTTON */}
                      <button onClick={() => setGameState('ONLINE_LOBBY')} className="p-4 bg-indigo-950 border border-indigo-700 rounded-xl flex items-center gap-4 hover:border-indigo-400 transition-colors col-span-1 md:col-span-2 justify-center shadow-[0_0_20px_rgba(79,70,229,0.2)]">
                          <div className="text-indigo-400 font-bold flex gap-2 items-center text-sm animate-pulse"><Icons.Globe size={16}/> ENTER ONLINE PVP LOBBY</div>
                      </button>
 
+                     {/* WIPE SAVE BUTTON */}
                      <button onClick={handleWipeSave} className="p-4 bg-slate-950/50 border border-red-900/50 rounded-xl flex items-center justify-center gap-2 hover:bg-red-900/20 hover:border-red-600 transition-colors col-span-1 md:col-span-2 mt-4 group">
                          <Icons.Trash2 size={16} className="text-red-700 group-hover:text-red-500" />
                          <span className="text-xs font-bold text-red-800 group-hover:text-red-500 uppercase tracking-widest">Wipe Save Data</span>
@@ -951,6 +1035,7 @@ const App: React.FC = () => {
              </div>
         )}
 
+        {/* ELEMENT EVOLUTION SELECT */}
         {gameState === 'ELEMENT_CHANGE' && (
             <div className="flex-1 flex flex-col items-center justify-center animate-fade-in">
                  <h2 className="text-3xl md:text-5xl font-bold fantasy-font mb-4 text-center bg-gradient-to-r from-blue-300 via-white to-purple-300 bg-clip-text text-transparent">Elemental Evolution</h2>
@@ -966,6 +1051,7 @@ const App: React.FC = () => {
                          const colorClass = ELEMENT_COLORS[element];
                          // @ts-ignore
                          const bgClass = ELEMENT_BG_COLORS[element];
+                         
                          const isCurrent = player.element === element;
 
                          return (
@@ -990,6 +1076,7 @@ const App: React.FC = () => {
             </div>
         )}
 
+        {/* SHOP */}
         {gameState === 'SHOP' && (
              <div className="flex-1 flex flex-col items-center animate-fade-in">
                  <div className="flex items-center gap-4 mb-6">
@@ -1020,6 +1107,7 @@ const App: React.FC = () => {
              </div>
         )}
 
+        {/* FUSION UI */}
         {gameState === 'FUSION' && (
             <div className="flex-1 flex flex-col items-center animate-fade-in">
                 <div className="flex items-center gap-4 mb-6">
@@ -1028,6 +1116,7 @@ const App: React.FC = () => {
                 </div>
                 
                 <div className="flex flex-col md:flex-row items-center gap-4 mb-8">
+                     {/* SLOT 1 */}
                      <div className={`w-32 h-32 border-2 border-dashed rounded-xl flex items-center justify-center p-2 text-center cursor-pointer transition-colors ${fusionSlot1 ? 'border-pink-500 bg-pink-900/20' : 'border-slate-700 hover:border-slate-500'}`} onClick={() => setFusionSlot1(null)}>
                          {fusionSlot1 ? (
                              <div>
@@ -1039,6 +1128,7 @@ const App: React.FC = () => {
 
                      <Icons.Plus className="text-slate-500" />
 
+                     {/* SLOT 2 */}
                      <div className={`w-32 h-32 border-2 border-dashed rounded-xl flex items-center justify-center p-2 text-center cursor-pointer transition-colors ${fusionSlot2 ? 'border-pink-500 bg-pink-900/20' : 'border-slate-700 hover:border-slate-500'}`} onClick={() => setFusionSlot2(null)}>
                          {fusionSlot2 ? (
                              <div>
@@ -1089,6 +1179,7 @@ const App: React.FC = () => {
             </div>
         )}
 
+        {/* ONLINE LOBBY */}
         {gameState === 'ONLINE_LOBBY' && (
             <div className="flex-1 flex flex-col items-center justify-center animate-fade-in p-4 text-center">
                  <button onClick={returnToTown} className="mb-4 text-slate-400 hover:text-white flex items-center gap-2"><Icons.ArrowLeft size={16}/> Back to Hub</button>
@@ -1103,6 +1194,7 @@ const App: React.FC = () => {
                      </div>
 
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                         {/* HOST */}
                          <div className="flex flex-col gap-2">
                              <div className="text-sm font-bold text-indigo-200">HOST GAME</div>
                              <div className="bg-slate-900 border border-slate-700 p-2 rounded flex items-center gap-2">
@@ -1112,6 +1204,7 @@ const App: React.FC = () => {
                              <p className="text-[10px] text-slate-500 text-left">Share this ID with your friend so they can join you.</p>
                          </div>
 
+                         {/* JOIN */}
                          <div className="flex flex-col gap-2">
                              <div className="text-sm font-bold text-indigo-200">JOIN GAME</div>
                              <div className="flex gap-2">
@@ -1131,6 +1224,7 @@ const App: React.FC = () => {
             </div>
         )}
 
+        {/* OFFLINE PVP MENU */}
         {gameState === 'PVP_MENU' && (
             <div className="flex-1 flex flex-col items-center justify-center animate-fade-in p-4">
                  <button onClick={returnToTown} className="mb-4 text-slate-400 hover:text-white flex items-center gap-2"><Icons.ArrowLeft size={16}/> Back to Hub</button>
@@ -1200,6 +1294,7 @@ const App: React.FC = () => {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
                                 {getAllRelevantAbilities().map(ability => {
                                     const isUnlocked = player.unlockedAbilities.includes(ability.id);
+                                    
                                     return (
                                         <AbilityCard 
                                             key={ability.id}
@@ -1215,6 +1310,8 @@ const App: React.FC = () => {
 
                             {gameState === 'VICTORY' && (
                                 <div className="flex gap-2 mt-4">
+                                    {/* Disable Element Evolve in PvP */}
+                                    {/* ONLY SHOW IF we haven't evolved for this milestone yet */}
                                     {(!isOnline && player.level % 5 === 0 && player.level > 1 && player.lastEvolvedLevel < player.level) ? (
                                         <button onClick={() => setGameState('ELEMENT_CHANGE')} className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold rounded-lg transition-all animate-pulse border border-white/20">
                                             ✨ EVOLVE ELEMENT ✨
