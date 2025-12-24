@@ -280,8 +280,6 @@ const VFXLayer: React.FC<{ activeEffect: VisualEffect }> = ({ activeEffect }) =>
     }
 };
 
-// ... (Avatar component remains unchanged) ...
-
 const Avatar: React.FC<{ 
     iconName?: string, 
     element: ElementType, 
@@ -367,14 +365,15 @@ export const BattleScene: React.FC<BattleSceneProps> = ({
     }
   }, [activeEffect]);
 
+  // FIX: Reduced translation distance to prevent characters from moving off-screen
   const getPlayerTransform = () => {
-      if (combatPhase === 'player_lunge') return 'translate-x-[200px] md:translate-x-[300px] scale-110 z-50'; 
+      if (combatPhase === 'player_lunge') return 'translate-x-12 md:translate-x-24 scale-110 z-50'; 
       if (combatPhase === 'enemy_lunge') return '-translate-x-4 brightness-150 grayscale'; 
       return 'translate-x-0 scale-100';
   };
 
   const getEnemyTransform = () => {
-      if (combatPhase === 'enemy_lunge') return '-translate-x-[200px] md:-translate-x-[300px] scale-110 z-50';
+      if (combatPhase === 'enemy_lunge') return '-translate-x-12 md:-translate-x-24 scale-110 z-50';
       if (combatPhase === 'player_lunge') return 'translate-x-4 brightness-150 grayscale';
       return 'translate-x-0 scale-100'; 
   };
@@ -406,7 +405,7 @@ export const BattleScene: React.FC<BattleSceneProps> = ({
       </div>
 
       {/* Actors */}
-      <div className="relative z-10 w-full h-full flex justify-between items-center px-8 md:px-24">
+      <div className="relative z-10 w-full h-full flex justify-between items-center px-6 md:px-24">
         
         {/* PLAYER SIDE */}
         <div className={`flex flex-col items-center gap-6 relative transition-transform duration-200 cubic-bezier(0.2, 0, 0, 1) ${getPlayerTransform()}`}>

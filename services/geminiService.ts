@@ -1,7 +1,8 @@
-import { GoogleGenAI, Type } from "@google/genai";
 import { Enemy, ElementType } from '../types';
 
-// --- PROCEDURAL DATA LISTS (FALLBACK) ---
+// --- OFFLINE PROCEDURAL ENEMY GENERATOR ---
+// This service creates enemies using randomized lists without any external API calls.
+// No internet connection is required for this to work.
 
 const ADJECTIVES_LOW = ["Weak", "Tiny", "Young", "Lost", "Tired", "Small", "Dusty", "Rusted", "Slow"];
 const ADJECTIVES_MID = ["Wild", "Feral", "Dark", "Angry", "Cursed", "Strong", "Rabid", "Swift", "Brutal", "Sharpened", "Bloody"];
@@ -105,79 +106,8 @@ const CRIT_TEMPLATES = [
 
 const getRandomElement = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
-// Initialize Gemini Client
-let ai: GoogleGenAI | null = null;
-if (process.env.API_KEY) {
-    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-}
-
 export const generateEnemy = async (playerLevel: number): Promise<Enemy> => {
-    // Try Gemini Generation if API Key is present
-    if (ai) {
-        try {
-            const model = 'gemini-3-flash-preview';
-            const prompt = `Create a unique fantasy RPG monster for a level ${playerLevel} player. 
-            It should be elemental. 
-            Return a JSON object with: 
-            - name
-            - description (short, flavorful)
-            - element (one of: Fire, Water, Earth, Air, Lightning, Ice, Light, Dark, Nature, Metal, Blood, Time, Arcane, Gravity, Sound, Venom, Crystal, Steam, Spirit, Cosmic, Sand, Magma)
-            - iconName (Choose strictly one from this list: Skull, Flame, Zap, Droplets, Mountain, Wind, Star, Moon, Ghost, Shield, Sword)
-            `;
-            
-            const response = await ai.models.generateContent({
-                model,
-                contents: prompt,
-                config: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            name: { type: Type.STRING },
-                            description: { type: Type.STRING },
-                            element: { type: Type.STRING },
-                            iconName: { type: Type.STRING },
-                        }
-                    }
-                }
-            });
-
-            const data = JSON.parse(response.text || "{}");
-            if (data.name) {
-                // Calculate stats procedurally based on level to ensure balance
-                const baseHp = 50 + (playerLevel * 25);
-                const maxHp = Math.floor(baseHp * (0.8 + Math.random() * 0.4));
-                
-                // Validate Element
-                let element: ElementType = 'Physical';
-                const validElements = Object.keys(MONSTER_DATA);
-                if (validElements.includes(data.element)) element = data.element as ElementType;
-                
-                // Validate Icon
-                const validIcons = ['Skull', 'Flame', 'Zap', 'Droplets', 'Mountain', 'Wind', 'Star', 'Moon', 'Ghost', 'Shield', 'Sword'];
-                const iconName = validIcons.includes(data.iconName) ? data.iconName : 'Skull';
-
-                return {
-                    name: data.name,
-                    description: data.description,
-                    maxHp,
-                    currentHp: maxHp,
-                    maxMp: 40 + (playerLevel * 5),
-                    currentMp: 40 + (playerLevel * 5),
-                    level: playerLevel,
-                    element,
-                    xpReward: 20 + (playerLevel * 10),
-                    goldReward: 15 + (playerLevel * 8),
-                    iconName: iconName,
-                    isBoss: false
-                };
-            }
-        } catch (e) {
-            console.warn("AI Generation failed, falling back to procedural.", e);
-        }
-    }
-
-    // --- PROCEDURAL FALLBACK ---
+    // --- PURE PROCEDURAL GENERATION ---
     let adjList = ADJECTIVES_LOW;
     let statMult = 1;
     
@@ -220,7 +150,6 @@ export const generateEnemy = async (playerLevel: number): Promise<Enemy> => {
 };
 
 export const generateCombatFlavor = async (action: string, attacker: string, target: string, damage: number, isCritical: boolean) => {
-    // Optional: Add AI flavor text generation here later if desired
     const templates = isCritical ? CRIT_TEMPLATES : FLAVOR_TEMPLATES;
     const template = getRandomElement(templates);
 
